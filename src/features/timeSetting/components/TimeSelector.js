@@ -65,25 +65,47 @@ export function TimeSelector({ times, selected, toggle }) {
   );
 }
 
+
+const DAY_CELL_WIDTH = 65;
+const TIME_LABEL_CELL_WIDTH = 60;
+const CELL_HEIGHT = 40;
+const DEFAULT_PADDING = 10;
+
+const HEADER_BORDER_WIDTH = 1;
+const TIME_LABEL_BORDER_WIDTH = 1;
+const CELL_BORDER_WIDTH = 0.5;
+
+const GRID_BORDER_COLOR = "#ccc";
+const CELL_BORDER_COLOR = "#eee";
+const SELECTED_CELL_BACKGROUND = "dodgerblue";
+const HEADER_FONT_WEIGHT = "bold";
+
 const styles = StyleSheet.create({
   row: { flexDirection: "row" },
   headerCell: {
-    width: 65,
-    padding: 10,
+    width: DAY_CELL_WIDTH,
+    padding: DEFAULT_PADDING,
     alignItems: "center",
     justifyContent: "center",
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
+    borderBottomWidth: HEADER_BORDER_WIDTH,
+    borderColor: GRID_BORDER_COLOR,
   },
-  headerText: { fontWeight: "bold" },
+  headerText: { fontWeight: HEADER_FONT_WEIGHT },
   timeLabelCell: {
-    width: 60,
-    padding: 10,
+    width: TIME_LABEL_CELL_WIDTH,
+    padding: DEFAULT_PADDING,
     alignItems: "center",
     justifyContent: "center",
-    borderRightWidth: 1,
-    borderColor: "#ccc",
+    borderRightWidth: TIME_LABEL_BORDER_WIDTH,
+    borderColor: GRID_BORDER_COLOR,
   },
-  cell: { width: 65, height: 40, borderWidth: 0.5, borderColor: "#eee" },
-  selectedCell: { backgroundColor: "dodgerblue" },
+  cell: { 
+    width: DAY_CELL_WIDTH, 
+    height: CELL_HEIGHT, 
+    borderWidth: CELL_BORDER_WIDTH, 
+    borderColor: CELL_BORDER_COLOR 
+  },
+  selectedCell: { 
+    backgroundColor: SELECTED_CELL_BACKGROUND 
+  },
 });
