@@ -10,11 +10,8 @@ export function TimeSettingScreen() {
   const { room, times, selected, toggle, submit } =
     useTimeSetting(roomId) || {};
 
-  const handleSubmit = async () => {
-    const ok = await submit();
-    if (ok) {
-      navigation.navigate("Result");
-    }
+  const handleSubmit = () => {
+    submit(navigation);
   };
 
   return (

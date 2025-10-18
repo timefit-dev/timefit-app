@@ -35,8 +35,11 @@ export function useTimeSetting(roomId) {
   };
 
   // 등록하기
-  const submit = async () => {
+  const submit = async (navigation) => {
     const result = await postAvailableTimes(roomId, Array.from(selected));
+    if (result.success) {
+      navigation.navigate("Result");
+    }
     return result.success;
   };
 
