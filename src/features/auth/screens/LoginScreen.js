@@ -1,8 +1,8 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-// ✅ 매직 넘버 제거용 상수 정의
+// 매직 넘버 제거용 상수 정의
 const LAYOUT = {
   PADDING_TOP: 90,
   LOGO_WIDTH: 300,
@@ -14,7 +14,7 @@ const LAYOUT = {
 export function LoginScreen() {
   const navigation = useNavigation();
 
-  // ✅ onPress 핸들러 추가
+  // onPress 핸들러 추가
   const handleGoogleLogin = () => {
     console.log("구글 로그인 시도");
     navigation.navigate("Dashboard");
@@ -42,28 +42,52 @@ export function LoginScreen() {
 
       {/* 소셜 로그인 버튼 */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#DB4437" }]}
+        {/* Google */}
+        <Pressable
           onPress={handleGoogleLogin}
+          style={({ pressed }) => [
+            styles.button,
+            styles.googleButton,
+            pressed && {
+              backgroundColor: "#C33C32",
+              transform: [{ scale: 0.97 }],
+            },
+          ]}
         >
           <Text style={styles.text}>G 구글로 로그인</Text>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#FEE500" }]}
+        {/* Kakao */}
+        <Pressable
           onPress={handleKakaoLogin}
+          style={({ pressed }) => [
+            styles.button,
+            styles.kakaoButton,
+            pressed && {
+              backgroundColor: "#E5CC00",
+              transform: [{ scale: 0.97 }],
+            },
+          ]}
         >
-          <Text style={[styles.text, { color: "#000" }]}>
+          <Text style={[styles.text, styles.kakaoText]}>
             💬 카카오로 로그인
           </Text>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#1EC800" }]}
+        {/* Naver */}
+        <Pressable
           onPress={handleNaverLogin}
+          style={({ pressed }) => [
+            styles.button,
+            styles.naverButton,
+            pressed && {
+              backgroundColor: "#18B300",
+              transform: [{ scale: 0.97 }],
+            },
+          ]}
         >
           <Text style={styles.text}>N 네이버로 로그인</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
@@ -96,10 +120,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 6,
+    transition: "all 0.1s",
   },
   text: {
     fontSize: 16,
     color: "#fff",
     fontWeight: "600",
+  },
+  googleButton: {
+    backgroundColor: "#DB4437",
+  },
+  kakaoButton: {
+    backgroundColor: "#FEE500",
+  },
+  kakaoText: {
+    color: "#000",
+  },
+  naverButton: {
+    backgroundColor: "#1EC800",
   },
 });
