@@ -1,92 +1,106 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  Image,
+  Dimensions,
+  Platform,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-// 매직 넘버 제거용 상수 정의
-const LAYOUT = {
-  PADDING_TOP: 90,
-  LOGO_WIDTH: 300,
-  LOGO_HEIGHT: 200,
-  LOGO_MARGIN_BOTTOM: 10,
-  BUTTON_HEIGHT: 50,
-};
+const { width, height } = Dimensions.get("window");
 
 export function LoginScreen() {
   const navigation = useNavigation();
 
-  // onPress 핸들러 추가
-  const handleGoogleLogin = () => {
-    console.log("구글 로그인 시도");
-    navigation.navigate("Dashboard");
-  };
-
-  const handleKakaoLogin = () => {
-    console.log("카카오 로그인 시도");
-    navigation.navigate("Dashboard");
-  };
-
-  const handleNaverLogin = () => {
-    console.log("네이버 로그인 시도");
+  const handleLogin = (type) => {
+    console.log(`${type} 로그인 시도`);
     navigation.navigate("Dashboard");
   };
 
   return (
     <View style={styles.container}>
-      {/* 로고 영역 */}
+      {/* 로고 */}
       <View style={styles.logoContainer}>
         <Image
           source={require("../../../../assets/logo.png")}
           style={styles.logo}
+          resizeMode="contain"
         />
       </View>
 
-      {/* 소셜 로그인 버튼 */}
+      {/* 로그인 버튼들 */}
       <View style={styles.buttonContainer}>
-        {/* Google */}
         <Pressable
-          onPress={handleGoogleLogin}
+          onPress={() => handleLogin("구글")}
           style={({ pressed }) => [
             styles.button,
             styles.googleButton,
-            pressed && {
-              backgroundColor: "#C33C32",
-              transform: [{ scale: 0.97 }],
-            },
+            pressed && styles.pressed,
           ]}
         >
-          <Text style={styles.text}>G 구글로 로그인</Text>
+          <View style={styles.iconRow}>
+            <Image
+              source={require("../../../../assets/google_icon.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.googleText}>구글로 로그인</Text>
+          </View>
         </Pressable>
 
-        {/* Kakao */}
         <Pressable
-          onPress={handleKakaoLogin}
+          onPress={() => handleLogin("카카오")}
           style={({ pressed }) => [
             styles.button,
             styles.kakaoButton,
-            pressed && {
-              backgroundColor: "#E5CC00",
-              transform: [{ scale: 0.97 }],
-            },
+            pressed && styles.pressed,
           ]}
         >
-          <Text style={[styles.text, styles.kakaoText]}>
-            💬 카카오로 로그인
-          </Text>
+          <View style={styles.iconRow}>
+            <Image
+              source={require("../../../../assets/kakao_icon.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.kakaoText}>카카오톡으로 로그인</Text>
+          </View>
         </Pressable>
 
-        {/* Naver */}
+        {Platform.OS === "ios" && (
+          <Pressable
+            onPress={() => handleLogin("애플")}
+            style={({ pressed }) => [
+              styles.button,
+              styles.appleButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <View style={styles.iconRow}>
+              <Image
+                source={require("../../../../assets/apple_icon.png")}
+                style={styles.icon}
+              />
+              <Text style={styles.appleText}>Apple로 로그인</Text>
+            </View>
+          </Pressable>
+        )}
+
         <Pressable
-          onPress={handleNaverLogin}
+          onPress={() => handleLogin("네이버")}
           style={({ pressed }) => [
             styles.button,
             styles.naverButton,
-            pressed && {
-              backgroundColor: "#18B300",
-              transform: [{ scale: 0.97 }],
-            },
+            pressed && styles.pressed,
           ]}
         >
-          <Text style={styles.text}>N 네이버로 로그인</Text>
+          <View style={styles.iconRow}>
+            <Image
+              source={require("../../../../assets/naver_icon.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.naverText}>네이버로 로그인</Text>
+          </View>
         </Pressable>
       </View>
     </View>
@@ -96,36 +110,49 @@ export function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
     justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: "#fff",
-    paddingHorizontal: 20,
-    paddingTop: LAYOUT.PADDING_TOP,
+    paddingHorizontal: width * 0.08,
+    paddingTop: height * 0.06,
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: LAYOUT.LOGO_MARGIN_BOTTOM,
+    marginBottom: height * 0.035,
   },
   logo: {
-    width: LAYOUT.LOGO_WIDTH,
-    height: LAYOUT.LOGO_HEIGHT,
+    width: width * 0.8,
+    height: height * 0.3,
   },
   buttonContainer: {
     width: "100%",
   },
   button: {
-    width: "100%",
-    height: LAYOUT.BUTTON_HEIGHT,
-    borderRadius: 6,
-    justifyContent: "center",
+    flexDirection: "row",
     alignItems: "center",
-    marginVertical: 6,
-    transition: "all 0.1s",
+    justifyContent: "center",
+    height: height * 0.052,
+    borderRadius: 10,
+    marginVertical: height * 0.009,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
-  text: {
-    fontSize: 16,
-    color: "#fff",
-    fontWeight: "600",
+  pressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.98 }],
+  },
+  iconRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  icon: {
+    width: width * 0.055,
+    height: width * 0.055,
+    marginRight: width * 0.025,
+    resizeMode: "contain",
   },
   googleButton: {
     backgroundColor: "#DB4437",
@@ -133,10 +160,30 @@ const styles = StyleSheet.create({
   kakaoButton: {
     backgroundColor: "#FEE500",
   },
-  kakaoText: {
-    color: "#000",
+  appleButton: {
+    backgroundColor: "#000",
   },
   naverButton: {
     backgroundColor: "#1EC800",
+  },
+  googleText: {
+    color: "#fff",
+    fontSize: width * 0.04,
+    fontWeight: "600",
+  },
+  kakaoText: {
+    color: "#000",
+    fontSize: width * 0.04,
+    fontWeight: "600",
+  },
+  appleText: {
+    color: "#fff",
+    fontSize: width * 0.04,
+    fontWeight: "600",
+  },
+  naverText: {
+    color: "#fff",
+    fontSize: width * 0.04,
+    fontWeight: "600",
   },
 });
