@@ -5,15 +5,14 @@ import {
   Pressable,
   StyleSheet,
   Image,
-  Dimensions,
+  useWindowDimensions,
   Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const { width, height } = Dimensions.get("window");
-
 export function LoginScreen() {
   const navigation = useNavigation();
+  const { width, height } = useWindowDimensions();
 
   const handleLogin = (type) => {
     console.log(`${type} 로그인 시도`);
@@ -25,83 +24,63 @@ export function LoginScreen() {
       {/* 로고 */}
       <View style={styles.logoContainer}>
         <Image
-          source={require("../../../../assets/logo.png")}
-          style={styles.logo}
+          source={require("@assets/logo.png")}
+          style={[styles.logo, { width: width * 0.8, height: height * 0.3 }]}
           resizeMode="contain"
         />
       </View>
 
       {/* 로그인 버튼들 */}
       <View style={styles.buttonContainer}>
-        <Pressable
-          onPress={() => handleLogin("구글")}
-          style={({ pressed }) => [
-            styles.button,
-            styles.googleButton,
-            pressed && styles.pressed,
-          ]}
-        >
-          <View style={styles.iconRow}>
-            <Image
-              source={require("../../../../assets/google_icon.png")}
-              style={styles.icon}
-            />
-            <Text style={styles.googleText}>구글로 로그인</Text>
-          </View>
-        </Pressable>
+        {["구글", "카카오", "애플", "네이버"].map((type) => {
+          if (type === "애플" && Platform.OS !== "ios") return null;
 
-        <Pressable
-          onPress={() => handleLogin("카카오")}
-          style={({ pressed }) => [
-            styles.button,
-            styles.kakaoButton,
-            pressed && styles.pressed,
-          ]}
-        >
-          <View style={styles.iconRow}>
-            <Image
-              source={require("../../../../assets/kakao_icon.png")}
-              style={styles.icon}
-            />
-            <Text style={styles.kakaoText}>카카오톡으로 로그인</Text>
-          </View>
-        </Pressable>
+          const buttonStyle = {
+            구글: styles.googleButton,
+            카카오: styles.kakaoButton,
+            애플: styles.appleButton,
+            네이버: styles.naverButton,
+          }[type];
 
-        {Platform.OS === "ios" && (
-          <Pressable
-            onPress={() => handleLogin("애플")}
-            style={({ pressed }) => [
-              styles.button,
-              styles.appleButton,
-              pressed && styles.pressed,
-            ]}
-          >
-            <View style={styles.iconRow}>
-              <Image
-                source={require("../../../../assets/apple_icon.png")}
-                style={styles.icon}
-              />
-              <Text style={styles.appleText}>Apple로 로그인</Text>
-            </View>
-          </Pressable>
-        )}
+          const iconSource = {
+            구글: require("@assets/google_icon.png"),
+            카카오: require("@assets/kakao_icon.png"),
+            애플: require("@assets/apple_icon.png"),
+            네이버: require("@assets/naver_icon.png"),
+          }[type];
 
-        <Pressable
-          onPress={() => handleLogin("네이버")}
-          style={({ pressed }) => [
-            styles.button,
-            styles.naverButton,
-            pressed && styles.pressed,
-          ]}
-        >
-          <View style={styles.iconRow}>
-            <Image
-              source={require("../../../../assets/naver_icon.png")}
-              style={styles.icon}
-            />
-            <Text style={styles.naverText}>네이버로 로그인</Text>
-          </View>
-        </Pressable>
+          const textStyle = {
+            구글: styles.googleText,
+            카카오: styles.kakaoText,
+            애플: styles.appleText,
+            네이버: styles.naverText,
+          }[type];
+
+          return (
+            <Pressable
+              key={type}
+              onPress={() => handleLogin(type)}
+              style={({ pressed }) => [
+                styles.button,
+                buttonStyle,
+                pressed && styles.pressed,
+              ]}
+            >
+              <View style={styles.iconRow}>
+                <Image
+                  source={iconSource}
+                  style={[
+                    styles.icon,
+                    { width: width * 0.055, height: width * 0.055 },
+                  ]}
+                />
+                <Text style={[textStyle, { fontSize: width * 0.04 }]}>
+                  {`${type}로 로그인`}
+                </Text>
+              </View>
+            </Pressable>
+          );
+        })}
       </View>
     </View>
   );
@@ -113,16 +92,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     justifyContent: "flex-start",
     alignItems: "center",
-    paddingHorizontal: width * 0.08,
-    paddingTop: height * 0.06,
+    paddingHorizontal: "8%",
+    paddingTop: "6%",
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: height * 0.035,
+    marginBottom: "4%",
   },
   logo: {
-    width: width * 0.8,
-    height: height * 0.3,
+    alignSelf: "center",
   },
   buttonContainer: {
     width: "100%",
@@ -131,9 +109,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    height: height * 0.052,
+    height: 50,
     borderRadius: 10,
-    marginVertical: height * 0.009,
+    marginVertical: 8,
     elevation: 3,
     shadowColor: "#000",
     shadowOpacity: 0.08,
@@ -149,41 +127,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   icon: {
-    width: width * 0.055,
-    height: width * 0.055,
-    marginRight: width * 0.025,
     resizeMode: "contain",
+    marginRight: 10,
   },
-  googleButton: {
-    backgroundColor: "#DB4437",
-  },
-  kakaoButton: {
-    backgroundColor: "#FEE500",
-  },
-  appleButton: {
-    backgroundColor: "#000",
-  },
-  naverButton: {
-    backgroundColor: "#1EC800",
-  },
-  googleText: {
-    color: "#fff",
-    fontSize: width * 0.04,
-    fontWeight: "600",
-  },
-  kakaoText: {
-    color: "#000",
-    fontSize: width * 0.04,
-    fontWeight: "600",
-  },
-  appleText: {
-    color: "#fff",
-    fontSize: width * 0.04,
-    fontWeight: "600",
-  },
-  naverText: {
-    color: "#fff",
-    fontSize: width * 0.04,
-    fontWeight: "600",
-  },
+  googleButton: { backgroundColor: "#DB4437" },
+  kakaoButton: { backgroundColor: "#FEE500" },
+  appleButton: { backgroundColor: "#000" },
+  naverButton: { backgroundColor: "#1EC800" },
+  googleText: { color: "#fff", fontWeight: "600" },
+  kakaoText: { color: "#000", fontWeight: "600" },
+  appleText: { color: "#fff", fontWeight: "600" },
+  naverText: { color: "#fff", fontWeight: "600" },
 });
