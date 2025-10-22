@@ -9,81 +9,16 @@ import {
   Share,
   Alert,
   LayoutAnimation,
-  Platform,
-  UIManager,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { useNavigation } from "@react-navigation/native";
-
-if (Platform.OS === "android") {
-  if (UIManager.setLayoutAnimationEnabledExperimental) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-  }
-}
+import { mockRooms } from "../../../data/mockData";
 
 export function DashboardScreen() {
   const navigation = useNavigation();
 
-  const rooms = [
-    {
-      id: "1",
-      title: "스터디룸 A",
-      date: "2025-10-21", // 방 생성 날짜
-      time: "09:00 ~ 18:00",
-      dates: ["10-15", "10-17", "10-20", "10-21"],
-      participants: [
-        {
-          id: 1,
-          name: "지현",
-          avatar: require("../../../../assets/profile1.jpg"),
-        },
-        {
-          id: 2,
-          name: "민수",
-          avatar: require("../../../../assets/profile2.jpg"),
-        },
-        {
-          id: 3,
-          name: "유진",
-          avatar: require("../../../../assets/profile3.jpg"),
-        },
-      ],
-    },
-    {
-      id: "2",
-      title: "회의실 B",
-      date: "2025-10-22",
-      time: "10:00 ~ 17:00",
-      dates: ["10-15", "10-17", "10-20", "10-21"],
-      participants: [
-        {
-          id: 1,
-          name: "가영",
-          avatar: require("../../../../assets/profile2.jpg"),
-        },
-        {
-          id: 2,
-          name: "현우",
-          avatar: require("../../../../assets/profile1.jpg"),
-        },
-      ],
-    },
-    {
-      id: "3",
-      title: "운동방 C",
-      date: "2025-10-23",
-      time: "07:00 ~ 09:00",
-      dates: ["10-15", "10-17", "10-20", "10-21"],
-      participants: [
-        {
-          id: 1,
-          name: "하늘",
-          avatar: require("../../../../assets/profile3.jpg"),
-        },
-      ],
-    },
-  ];
+  const rooms = mockRooms;
 
   const [expandedRoomId, setExpandedRoomId] = useState(null);
 
@@ -109,7 +44,7 @@ export function DashboardScreen() {
   };
 
   const renderRoom = ({ item }) => {
-    const isExpanded = expandedRoomId === item.id;
+    const isExpanded = expandedRoomId === item.roomNumber;
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate("TimeSetting", { room: item })}
@@ -129,7 +64,7 @@ export function DashboardScreen() {
                 <Ionicons name="link-outline" size={22} color="#007AFF" />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => toggleExpand(item.id)}
+                onPress={() => toggleExpand(item.roomNumber)}
                 style={styles.iconButton}
               >
                 <Ionicons
@@ -145,8 +80,11 @@ export function DashboardScreen() {
 
           {isExpanded && (
             <View style={styles.roomDetails}>
+              <Text style={styles.infoText}>방장: {item.owner}</Text>
               <Text style={styles.infoText}>날짜: {item.dates.join(", ")}</Text>
-              <Text style={styles.infoText}>시간대: {item.time}</Text>
+              <Text style={styles.infoText}>
+                시간대: {item.startTime} ~ {item.endTime}
+              </Text>
               <Text style={styles.infoText}>
                 참가자 수: {item.participants.length}명
               </Text>
@@ -186,7 +124,7 @@ export function DashboardScreen() {
       <FlatList
         data={rooms}
         renderItem={renderRoom}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.roomNumber}
         contentContainerStyle={styles.listContainer}
       />
 
