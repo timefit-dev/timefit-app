@@ -32,33 +32,29 @@ export function ResultScreen({ route }) {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={null}>
-        <View style={styles.header}>
-          <Text style={styles.title}>결과</Text>
-          <Text style={styles.roomName}>{resultData ? resultData.roomInfo.title : "방 제목"}</Text>
-        </View>
-        
-        {/* 전체 시간표를 결과 모드로 렌더링 */}
-        <TimeTable
-          times={availableTimes}
-          availability={availabilityData}
-          readOnly={true}
-        />
-
-        <View style={styles.recommendationContainer}>
-          {/* 추천 시간 목록 */}
-          <Text style={styles.recommendationTitle}>추천 시간 Top 3</Text>
-          {topAvailableSlots.map((slot, index) => (
-            <ResultCard
-              key={slot.dateTime}
-              slot={slot}
-              index={index}
-              isExpanded={expandedSlotId === slot.dateTime}
-              onToggle={toggleExpand}
-              totalParticipants={resultData?.roomInfo.totalParticipants}
-            />
-          ))}
-        </View>
+      <View style={styles.header}>
+        <Text style={styles.title}>결과</Text>
+        <Text style={styles.roomName}>{resultData ? resultData.roomInfo.title : "방 제목"}</Text>
+      </View>
+      {/* 전체 시간표를 결과 모드로 렌더링 */}
+      <TimeTable
+        times={availableTimes}
+        availability={availabilityData}
+        readOnly={true}
+      />
+      <View style={styles.recommendationContainer}>
+        {/* 추천 시간 목록 */}
+        <Text style={styles.recommendationTitle}>추천 시간 Top 3</Text>
+        {topAvailableSlots.map((slot, index) => (
+          <ResultCard
+            key={slot.dateTime}
+            slot={slot}
+            index={index}
+            isExpanded={expandedSlotId === slot.dateTime}
+            onToggle={toggleExpand}
+            totalParticipants={resultData?.roomInfo.totalParticipants}
+          />
+        ))}
       </View>
       <View style={styles.buttonContainer}>
         <Pressable
