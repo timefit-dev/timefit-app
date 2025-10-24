@@ -32,8 +32,12 @@ export function ResultScreen({ route }) {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.contentContainer}>
-        <Text style={styles.title}>결과</Text>
+      <View style={null}>
+        <View style={styles.header}>
+          <Text style={styles.title}>결과</Text>
+          <Text style={styles.roomName}>{resultData ? resultData.roomInfo.title : "방 제목"}</Text>
+        </View>
+        
         {/* 전체 시간표를 결과 모드로 렌더링 */}
         <TimeTable
           times={availableTimes}
@@ -56,15 +60,17 @@ export function ResultScreen({ route }) {
           ))}
         </View>
       </View>
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={styles.editButton}
+          onPress={() => navigation.navigate("TimeSetting", { roomId })}>
+          <Text style={styles.editButtonText}>수정하기</Text>
+        </Pressable>
+        <Pressable style={styles.toDashboardButton} onPress={() => navigation.navigate("Dashboard")}>
+          <Text style={styles.toDashboardButtonText}>목록으로</Text>
+        </Pressable>
+      </View>
 
-      <Pressable
-        style={styles.editButton}
-        onPress={() => navigation.navigate("TimeSetting", { roomId })}>
-        <Text style={styles.editButtonText}>수정하기</Text>
-      </Pressable>
-      <Pressable style={styles.toDashboardButton} onPress={() => navigation.navigate("Dashboard")}>
-        <Text style={styles.toDashboardButtonText}>목록으로</Text>
-      </Pressable>
     </ScrollView>
   );
 }
@@ -92,27 +98,25 @@ const SPACING_BUTTON_BOTTOM = 10;
 const BORDER_RADIUS_DEFAULT = 10;
 
 const styles = StyleSheet.create({
+  header: {padding: 20, borderBottomWidth: 1, borderColor: "#eee",},
   container: {
     flex: 1,
     backgroundColor: COLOR_WHITE,
-    paddingTop: SPACING_CONTAINER,
-  },
-  contentContainer: {
-    padding: SPACING_CONTAINER,
   },
   title: {
     fontSize: FONT_SIZE_TITLE,
     fontWeight: FONT_WEIGHT_BOLD,
-    marginBottom: SPACING_CONTAINER,
   },
+  roomName: { fontSize: 16, color: "gray", marginTop: 4 },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   recommendationContainer: {
+    padding: SPACING_CONTAINER,
     marginTop: SPACING_SECTION_TOP,
-    paddingBottom: SPACING_CONTAINER,
+    marginBottom: SPACING_SECTION_TOP,
   },
   recommendationTitle: {
     fontSize: FONT_SIZE_RECOMMENDATION_TITLE,
@@ -137,6 +141,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   toDashboardButtonText: { color: COLOR_WHITE, fontSize: FONT_SIZE_BUTTON, fontWeight: FONT_WEIGHT_BOLD },
+  buttonContainer: { bottom: 20 },
 });
 
 export default ResultScreen;
