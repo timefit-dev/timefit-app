@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { getRoomInfo, postAvailableTimes } from "../services/timeSettingApi";
 
 export function useTimeSetting(roomId) {
   const [room, setRoom] = useState(null);
   const [times, setTimes] = useState([]);
   const [selected, setSelected] = useState(new Set());
+  const navigation = useNavigation();
 
   // 방 정보 불러오기
   useEffect(() => {
@@ -17,7 +19,7 @@ export function useTimeSetting(roomId) {
         const generatedTimes = data.dates.flatMap((date) =>
           data.timeSlots.map((time) => `${date} ${time}`)
         );
-        console.log(generatedTimes);
+        // console.log(generatedTimes);
         setTimes(generatedTimes);
       }
     };
@@ -35,10 +37,12 @@ export function useTimeSetting(roomId) {
   };
 
   // 등록하기
-  const submit = async (navigation) => {
+  const submit = async () => {
     const result = await postAvailableTimes(roomId, Array.from(selected));
     if (result.success) {
-      navigation.navigate("Result");
+      navigation.navigate("Result", {
+        roomId: roomId,
+      });
     }
     return result.success;
   };

@@ -1,17 +1,15 @@
 import React from "react";
-import { View, Text, Pressable, Alert, StyleSheet, ScrollView, } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useTimeSetting } from "../hooks/useTimeSetting";
-import { TimeSelector } from "../components/TimeSelector";
+import { TimeTable } from "../../../shared/components/TimeTable";
 
-export function TimeSettingScreen() {
-  const navigation = useNavigation();
-  const roomId = 1;
-  const { room, times, selected, toggle, submit } =
+export function TimeSettingScreen({ route }) {
+  const { roomId = 1 } = route.params || {};
+  const { room, times, selected, toggle, submit } = 
     useTimeSetting(roomId) || {};
 
   const handleSubmit = () => {
-    submit(navigation);
+    submit();
   };
 
   return (
@@ -27,7 +25,7 @@ export function TimeSettingScreen() {
         </Text>
       </View>
       <View style={styles.selectorContainer}>
-        <TimeSelector times={times} selected={selected} toggle={toggle} />
+        <TimeTable times={times} selected={selected} toggle={toggle} />
       </View>
       <Pressable style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}>등록하기</Text>
@@ -41,7 +39,7 @@ const styles = StyleSheet.create({
   header: { padding: 20, borderBottomWidth: 1, borderColor: "#eee" },
   title: { fontSize: 24, fontWeight: "bold" },
   participants: { fontSize: 16, color: "gray", marginTop: 4 },
-  selectorContainer: { flex: 1 },
+  selectorContainer: { flex: 1, padding: 0, },
   submitButton: {
     backgroundColor: "dodgerblue",
     padding: 15,
