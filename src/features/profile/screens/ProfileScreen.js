@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export function ProfileScreen() {
   const [name, setName] = useState("유지현");
+  const [prevName, setPrevName] = useState(name); // ✅ 수정 전 이름 저장
   const [isEditing, setIsEditing] = useState(false);
   const [photo, setPhoto] = useState(require("@assets/profile.jpg"));
 
@@ -27,9 +28,25 @@ export function ProfileScreen() {
 
   const handleOutsidePress = () => {
     if (isEditing) {
-      setIsEditing(false);
+      handleFinishEditing();
       Keyboard.dismiss();
     }
+  };
+
+  // ✅ 이름 수정 시작 시 이전 이름 저장
+  const handleStartEditing = () => {
+    setPrevName(name);
+    setIsEditing(true);
+  };
+
+  // ✅ 이름 수정 완료 처리 함수
+  const handleFinishEditing = () => {
+    if (name.trim() === "") {
+      Alert.alert("입력 오류", "이름은 비워둘 수 없습니다.");
+      setName(prevName); // ⚠️ 빈 값이면 이전 이름으로 복구
+      return;
+    }
+    setIsEditing(false);
   };
 
   return (
@@ -51,16 +68,16 @@ export function ProfileScreen() {
               style={styles.input}
               value={name}
               onChangeText={setName}
-              onBlur={() => setIsEditing(false)}
+              onBlur={handleFinishEditing}
               autoFocus
             />
           ) : (
-            <TouchableOpacity onPress={() => setIsEditing(true)}>
+            <TouchableOpacity onPress={handleStartEditing}>
               <Text style={styles.name}>{name}</Text>
             </TouchableOpacity>
           )}
 
-          {/* ✅ 내 정보 카드 */}
+          {/* 내 정보 카드 */}
           <View style={styles.infoCard}>
             <Text style={styles.infoTitle}>내 정보</Text>
             <View style={styles.infoRow}>
@@ -122,7 +139,7 @@ const styles = StyleSheet.create({
   },
   name: {
     marginTop: 15,
-    fontSize: 26, // ✅ 이름 크기 확대
+    fontSize: 26,
     fontWeight: "700",
     color: "#222",
   },
@@ -136,7 +153,6 @@ const styles = StyleSheet.create({
     width: 180,
     fontWeight: "700",
   },
-  // ✅ 내 정보 카드
   infoCard: {
     backgroundColor: "#f8f8f8",
     borderRadius: 12,
