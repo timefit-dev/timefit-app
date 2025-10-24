@@ -22,23 +22,6 @@ export function ResultScreen({ route }) {
     toggleExpand,
   } = useResult(roomId);
 
-  return (
-    <ResultView
-      navigation={navigation}
-      isLoading={isLoading}
-      error={error}
-      availableTimes={availableTimes}
-      availabilityData={availabilityData}
-      topAvailableSlots={topAvailableSlots}
-      expandedSlotId={expandedSlotId}
-      toggleExpand={toggleExpand}
-      totalParticipants={resultData?.roomInfo.totalParticipants}
-      roomId={roomId}
-    />
-  );
-}
-
-function ResultView({ navigation, isLoading, error, availableTimes, availabilityData, topAvailableSlots, expandedSlotId, toggleExpand, totalParticipants, roomId }) {
   if (isLoading) {
     return <View style={styles.centered}><ActivityIndicator size="large" /></View>;
   }
@@ -68,7 +51,7 @@ function ResultView({ navigation, isLoading, error, availableTimes, availability
               index={index}
               isExpanded={expandedSlotId === slot.dateTime}
               onToggle={toggleExpand}
-              totalParticipants={totalParticipants}
+              totalParticipants={resultData?.roomInfo.totalParticipants}
             />
           ))}
         </View>
