@@ -82,5 +82,14 @@ export function useResult(roomId) {
     setExpandedSlotId(expandedSlotId === slotId ? null : slotId);
   };
 
-  return { isLoading, error, resultData, availabilityData, availableTimes, topAvailableSlots, expandedSlotId, toggleExpand };
+  return {
+    isLoading,
+    error,
+    resultData,
+    availabilityData,
+    availableTimes,
+    topAvailableSlots,
+    expandedSlotId,
+    toggleExpand
+  };
 }
