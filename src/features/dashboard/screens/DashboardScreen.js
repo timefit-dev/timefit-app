@@ -108,10 +108,7 @@ export function DashboardScreen() {
     <View style={styles.container}>
       {/* 상단 헤더 */}
       <View style={styles.header}>
-        <Image
-          source={require("../../../../assets/logo.png")}
-          style={styles.logo}
-        />
+        <Image source={require("@assets/logo.png")} style={styles.logo} />
         <TouchableOpacity
           style={styles.profileButton}
           onPress={() => navigation.navigate("Profile")}

@@ -13,6 +13,10 @@ export function ProfileCard() {
         <Text style={styles.infoLabel}>참여한 모임</Text>
         <Text style={styles.infoValue}>5개</Text>
       </View>
+      <View style={styles.infoRow}>
+        <Text style={styles.infoLabel}>이메일</Text>
+        <Text style={styles.infoValue}>a123@naver.com</Text>
+      </View>
     </View>
   );
 }

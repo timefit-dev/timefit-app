@@ -3,9 +3,10 @@ export async function getProfileData() {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
-        name: "유지현",
-        joinDate: "2025-03-10",
-        groupCount: 5,
+        id: 1,
+        email: "a123@naver.com",
+        nickname: "유지현",
+        profile_image: "null",
       });
     }, 300);
   });
