@@ -25,7 +25,7 @@ export function LoginScreen() {
       <View style={styles.logoContainer}>
         <Image
           source={require("@assets/logo.png")}
-          style={[styles.logo, { width: width * 0.8, height: height * 0.3 }]}
+          style={[styles.logo, { width: width * 0.5, height: height * 0.2 }]}
           resizeMode="contain"
         />
       </View>
@@ -97,7 +97,8 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: "4%",
+    marginBottom: "25%",
+    marginTop: "10%",
   },
   logo: {
     alignSelf: "center",
