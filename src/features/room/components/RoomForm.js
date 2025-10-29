@@ -228,7 +228,7 @@ export function RoomForm({ onSubmit }) {
               />
 
               {/* 콜론 */}
-              <Text style={styles.colon}>:</Text>
+              <Text style={[styles.colon, {marginBottom: 5}]}>:</Text>
 
               {/* 분 */}
               <FlatList
