@@ -1,4 +1,3 @@
-// room/screens/RoomCreateScreen.js
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { RoomForm } from "../components/RoomForm";
