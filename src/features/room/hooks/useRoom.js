@@ -2,19 +2,9 @@ import { Alert } from "react-native";
 import { roomApi } from "../services/roomApi";
 
 export function useRoom() {
-  const createRoom = async ({ title, dates, startTime, endTime }) => {
-    if (!title.trim()) return Alert.alert("⚠️ 제목을 입력해주세요");
-    if (!dates.length) return Alert.alert("⚠️ 날짜를 선택해주세요");
-    if (!startTime || !endTime) return Alert.alert("⚠️ 시간대를 입력해주세요");
-
+  const createRoom = async (roomData) => {
     try {
-      const result = await roomApi.createRoom({
-        title,
-        dates,
-        startTime,
-        endTime,
-      });
-
+      const result = await roomApi.createRoom(roomData);
       console.log("✅ 방 생성 성공 (테스트):", result);
       return result;
     } catch (e) {
@@ -23,6 +13,5 @@ export function useRoom() {
       return null;
     }
   };
-
   return { createRoom };
 }
