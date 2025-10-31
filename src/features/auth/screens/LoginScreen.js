@@ -16,7 +16,8 @@ export function LoginScreen() {
 
   const handleLogin = (type) => {
     console.log(`${type} 로그인 시도`);
-    navigation.navigate("Dashboard");
+    // TODO: 실제 소셜 로그인 로직 구현 후, 성공 시 아래 코드로 닉네임 설정 화면으로 이동
+    navigation.navigate("NicknameSetup");
   };
 
   return (

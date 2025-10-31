@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import { LoginScreen } from "../features/auth/screens/LoginScreen";
+import { NicknameSetupScreen } from "../features/auth/screens/NicknameSetupScreen";
 import { DashboardScreen } from "../features/dashboard/screens/DashboardScreen";
 import { ProfileScreen } from "../features/profile/screens/ProfileScreen";
 import { RoomCreateScreen } from "../features/room/screens/RoomCreateScreen";
@@ -16,6 +17,7 @@ export function AppNavigation() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="NicknameSetup" component={NicknameSetupScreen} />
         <Stack.Screen name="Dashboard" component={DashboardScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="RoomCreate" component={RoomCreateScreen} />
