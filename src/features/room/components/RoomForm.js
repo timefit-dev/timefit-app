@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import * as Haptics from "expo-haptics";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ITEM_HEIGHT = 40;
 const VISIBLE_ITEMS = 5;
@@ -33,8 +33,8 @@ export function RoomForm({ onSubmit }) {
   const minuteRef = useRef(null);
   const insets = useSafeAreaInsets();
 
-  const HOURS = Array.from({ length: 24 }, (_, i) => i); // 0~23
-  const MINUTES = Array.from({ length: 60 }, (_, i) => i); // 0~59
+  const HOURS = Array.from({ length: 24 }, (_, i) => i);
+  const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
   // ✅ 날짜 선택
   const handleDayPress = (day) => {
@@ -63,7 +63,6 @@ export function RoomForm({ onSubmit }) {
       useNativeDriver: true,
     }).start();
 
-    // FlatList 기본 위치
     setTimeout(() => {
       hourRef.current?.scrollToOffset({ offset: 0, animated: false });
       minuteRef.current?.scrollToOffset({ offset: 0, animated: false });
@@ -72,53 +71,34 @@ export function RoomForm({ onSubmit }) {
 
   // ✅ 시간 확정
   const handleConfirm = async () => {
-    const formatted = `${String(hour).padStart(2, "0")}:${String(minute).padStart(
-      2,
-      "0"
-    )}`;
+    const formatted = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 
     if (pickerMode === "start") {
       setStartTime(formatted);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
-      // 종료시간 선택으로 자연스럽게 이동
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => {
-        setPickerMode("end");
-        setTimeout(() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          fadeAnim.setValue(0);
-          Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: true,
-          }).start();
-
-          // 종료 시간도 기본 00:00 위치
-          hourRef.current?.scrollToOffset({ offset: 0, animated: false });
-          minuteRef.current?.scrollToOffset({ offset: 0, animated: false });
-        }, 250);
-      });
-    } else {
-      if (startTime && formatted <= startTime) {
-        Alert.alert("⚠️ 종료 시간은 시작 시간보다 늦어야 합니다.");
-        return;
-      }
-      setEndTime(formatted);
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setPickerVisible(false);
-    }
-  };
-
-  // ✅ 폼 제출
-  const handleSubmit = () => {
-    if (!title.trim() || !Object.keys(selectedDates).length || !startTime || !endTime) {
-      Alert.alert("⚠️ 모든 항목을 입력해주세요.");
+      // 다음으로 종료 시간 선택으로 자동 이동
+      setPickerMode("end");
       return;
     }
+
+    // 종료 시간 검증
+    if (startTime && formatted <= startTime) {
+      Alert.alert("⚠️ 종료 시간은 시작 시간보다 늦어야 합니다.");
+      return;
+    }
+
+    setEndTime(formatted);
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setPickerVisible(false);
+  };
+
+  // ✅ 폼 제출 (중복 검증 제거, RoomForm만 담당)
+  const handleSubmit = () => {
+    if (!title.trim()) return Alert.alert("⚠️ 제목을 입력해주세요.");
+    if (!Object.keys(selectedDates).length)
+      return Alert.alert("⚠️ 날짜를 선택해주세요.");
+    if (!startTime || !endTime)
+      return Alert.alert("⚠️ 시간대를 설정해주세요.");
 
     onSubmit({
       title,
@@ -128,22 +108,22 @@ export function RoomForm({ onSubmit }) {
     });
   };
 
-  // ✅ 드래그 시 중앙 인덱스 감지 (톡 효과)
+  // ✅ 드래그 시 중앙 인덱스 감지
   const onScroll = (e, setValue, list, currentValue) => {
     const offsetY = e.nativeEvent.contentOffset.y;
     const index = Math.round(offsetY / ITEM_HEIGHT);
-
-    // 리스트 범위 초과 방지
-    if (index >= 0 && index < list.length) {
-      if (list[index] !== currentValue) {
-        setValue(list[index]);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }
+    if (index >= 0 && index < list.length && list[index] !== currentValue) {
+      setValue(list[index]);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
   };
 
   return (
-    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}>
+    <ScrollView
+      style={styles.container}
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
+    >
       {/* 제목 입력 */}
       <Text style={styles.label}>모임 제목</Text>
       <TextInput
@@ -189,7 +169,7 @@ export function RoomForm({ onSubmit }) {
         </TouchableOpacity>
       </View>
 
-      {/* 휠형 시간 선택기 */}
+      {/* 시간 선택 모달 */}
       <Modal visible={pickerVisible} transparent animationType="fade">
         <View style={styles.overlay}>
           <Animated.View style={[styles.modalContainer, { opacity: fadeAnim }]}>
@@ -197,11 +177,7 @@ export function RoomForm({ onSubmit }) {
               {pickerMode === "start" ? "시작 시간 선택" : "종료 시간 선택"}
             </Text>
 
-            {/* 중앙선 가이드 */}
-            <View style={styles.centerLine} />
-
             <View style={styles.wheelContainer}>
-              {/* 시 */}
               <FlatList
                 ref={hourRef}
                 data={HOURS}
@@ -216,7 +192,6 @@ export function RoomForm({ onSubmit }) {
                   paddingTop: (VISIBLE_ITEMS / 2 - 0.6) * ITEM_HEIGHT,
                   paddingBottom: (VISIBLE_ITEMS / 2 - 0.4) * ITEM_HEIGHT,
                 }}
-                snapToOffsets={HOURS.map((_, i) => i * ITEM_HEIGHT)}
                 renderItem={({ item }) => (
                   <View style={styles.itemContainer}>
                     <Text style={[styles.item, item === hour && styles.selected]}>
@@ -227,10 +202,8 @@ export function RoomForm({ onSubmit }) {
                 style={styles.wheel}
               />
 
-              {/* 콜론 */}
-              <Text style={[styles.colon, {marginBottom: 5}]}>:</Text>
+              <Text style={[styles.colon, { marginBottom: 5 }]}>:</Text>
 
-              {/* 분 */}
               <FlatList
                 ref={minuteRef}
                 data={MINUTES}
@@ -245,7 +218,6 @@ export function RoomForm({ onSubmit }) {
                   paddingTop: (VISIBLE_ITEMS / 2 - 0.6) * ITEM_HEIGHT,
                   paddingBottom: (VISIBLE_ITEMS / 2 - 0.4) * ITEM_HEIGHT,
                 }}
-                snapToOffsets={MINUTES.map((_, i) => i * ITEM_HEIGHT)}
                 renderItem={({ item }) => (
                   <View style={styles.itemContainer}>
                     <Text style={[styles.item, item === minute && styles.selected]}>
@@ -277,15 +249,19 @@ export function RoomForm({ onSubmit }) {
       </Modal>
 
       {/* 생성 버튼 */}
-      <TouchableOpacity style={[styles.createButton, { marginBottom: insets.bottom + 10 }]} onPress={handleSubmit}>
+      <TouchableOpacity
+        style={[styles.createButton, { marginBottom: insets.bottom + 10 }]}
+        onPress={handleSubmit}
+      >
         <Text style={styles.createButtonText}>방 생성</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
 
+// 스타일
 const styles = StyleSheet.create({
-  container: { padding: 20, },
+  container: { padding: 20 },
   label: { fontSize: 16, fontWeight: "bold", marginBottom: 8, marginTop: 12 },
   input: {
     borderWidth: 1,
@@ -309,13 +285,7 @@ const styles = StyleSheet.create({
   timeLabel: { fontSize: 13, color: "#888" },
   timeValue: { fontSize: 20, fontWeight: "600", color: "#aaa", marginTop: 5 },
   activeValue: { color: "#333" },
-  colon: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#555",
-    marginHorizontal: 8,
-    marginTop: -8,
-  },
+  colon: { fontSize: 28, fontWeight: "bold", color: "#555", marginHorizontal: 8 },
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
@@ -330,38 +300,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: -10 },
-  centerLine: {
-    position: "absolute",
-    top: "50%",
-    left: "10%",
-    right: "10%",
-    height: 1,
-    transform: [{ translateY: -0.5 }],
-  },
   wheelContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 4,
-    gap: -10,
   },
   wheel: { height: ITEM_HEIGHT * VISIBLE_ITEMS, width: 80 },
-  itemContainer: {
-    height: ITEM_HEIGHT,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  item: {
-    fontSize: 22,
-    color: "#bbb",
-    textAlign: "center",
-  },
-  selected: {
-    color: "#333",
-    fontWeight: "bold",
-    fontSize: 28,
-    transform: [{ scale: 1.08 }],
-  },
+  itemContainer: { height: ITEM_HEIGHT, justifyContent: "center", alignItems: "center" },
+  item: { fontSize: 22, color: "#bbb", textAlign: "center" },
+  selected: { color: "#333", fontWeight: "bold", fontSize: 28 },
   modalButtons: { flexDirection: "row", marginTop: 15 },
   modalButton: {
     flex: 1,
@@ -377,9 +325,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
-  createButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+  createButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
 });
