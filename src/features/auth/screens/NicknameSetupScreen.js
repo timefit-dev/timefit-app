@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,19 +10,30 @@ import {
   Alert,
   TouchableWithoutFeedback,
   Keyboard,
+  Image,
+  useWindowDimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 export function NicknameSetupScreen() {
   const [nickname, setNickname] = useState("");
   const navigation = useNavigation();
+  const { width, height } = useWindowDimensions();
+
+  // 닉네임 유효성 검사 (1~12자, 특수문자 및 공백 제외)
+  const isNicknameValid = useMemo(() => {
+    const regex = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣]{1,12}$/;
+    return regex.test(nickname);
+  }, [nickname]);
 
   const handleConfirm = () => {
-    if (nickname.trim().length < 2) {
-      Alert.alert("알림", "닉네임은 2자 이상으로 입력해주세요.");
+    if (!isNicknameValid) {
+      Alert.alert(
+        "알림",
+        "닉네임은 1~12자의 한글, 영문, 숫자만 사용할 수 있습니다."
+      );
       return;
     }
-    // TODO: 닉네임 저장 API 호출 또는 상태 관리 로직 추가
     console.log(`설정된 닉네임: ${nickname}`);
     navigation.reset({
       index: 0,
@@ -44,20 +55,24 @@ export function NicknameSetupScreen() {
           <TextInput
             style={styles.input}
             value={nickname}
-            onChangeText={setNickname}
-            placeholder="닉네임 (2자 이상)"
+            onChangeText={(text) => setNickname(text.replace(/\s/g, ""))} // 공백 입력 방지
+            placeholder="닉네임 (1~12자)"
             placeholderTextColor="#999"
             autoFocus={true}
             returnKeyType="done"
             onSubmitEditing={handleConfirm}
+            maxLength={12}
           />
+          <Text style={styles.validationText}>
+            * 1~12자의 한글, 영문, 숫자만 사용 가능합니다.
+          </Text>
           <TouchableOpacity
             style={[
               styles.button,
-              nickname.trim().length < 2 && styles.buttonDisabled,
+              !isNicknameValid && styles.buttonDisabled,
             ]}
             onPress={handleConfirm}
-            disabled={nickname.trim().length < 2}
+            disabled={!isNicknameValid}
           >
             <Text style={styles.buttonText}>시작하기</Text>
           </TouchableOpacity>
@@ -76,10 +91,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     backgroundColor: "#fff",
   },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: "15%",
+    marginTop: "5%",
+  },
+  logo: {
+    alignSelf: "center",
+  },
   title: { 
     fontSize: 28, 
     fontWeight: "bold", 
-    marginBottom: 10 
+    marginBottom: 10,
+    color: "#333",
 },
   subtitle: { 
     fontSize: 16, 
@@ -95,7 +119,13 @@ const styles = StyleSheet.create({
     borderRadius: 10, 
     paddingHorizontal: 15, 
     fontSize: 16, 
-    marginBottom: 20 
+    marginBottom: 10,
+},
+  validationText: {
+    width: "100%",
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 20,
 },
   button: { 
     width: "100%", 
