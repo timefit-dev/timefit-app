@@ -1,9 +1,27 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
-import { TimeTable } from "../../../shared/components/TimeTable";
+import { TimeTable, DAY_CELL_WIDTH, CELL_HEIGHT, CELL_BORDER_WIDTH, CELL_BORDER_COLOR, } from "../../../shared/components/TimeTable";
 import { ResultCard } from "../components/ResultCard";
 import { useResult } from "../hooks/useResult";
+
+// 결과를 표시하는 셀 컴포넌트
+const ResultCell = React.memo(function ResultCell({ date, time, availability }) {
+  const cellStyle = React.useMemo(() => {
+    const dateTime = `${date} ${time}`;
+    if (availability?.counts.has(dateTime)) {
+      const count = availability.counts.get(dateTime);
+      const total = availability.total || 1;
+      const opacity = total > 0 ? Math.max(0.1, count / total) : 0.1;
+      return {
+        backgroundColor: `rgba(30, 144, 255, ${opacity})`,
+      };
+    }
+    return {};
+  }, [availability, date, time]);
+
+  return <View style={[styles.cell, cellStyle]} />;
+});
 
 export function ResultScreen({ route }) {
   const navigation = useNavigation();
@@ -39,8 +57,12 @@ export function ResultScreen({ route }) {
       {/* 전체 시간표를 결과 모드로 렌더링 */}
       <TimeTable
         times={availableTimes}
-        availability={availabilityData}
-        readOnly={true}
+        renderCell={({ date, time }) => {
+          const dateTime = `${date} ${time}`;
+          return (
+            <ResultCell key={dateTime} date={date} time={time} availability={availabilityData} />
+          );
+        }}
       />
       <View style={styles.recommendationContainer}>
         {/* 추천 시간 목록 */}
@@ -108,6 +130,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  cell: {
+    width: DAY_CELL_WIDTH,
+    height: CELL_HEIGHT,
+    borderWidth: CELL_BORDER_WIDTH,
+    borderColor: CELL_BORDER_COLOR,
   },
   recommendationContainer: {
     padding: SPACING_CONTAINER,
