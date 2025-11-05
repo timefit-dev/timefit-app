@@ -44,7 +44,7 @@ export function RoomForm({ onSubmit }) {
       newDates[day.dateString] = {
         selected: true,
         marked: true,
-        selectedColor: "#6C63FF",
+        selectedColor: "dodgerblue",
       };
     setSelectedDates(newDates);
   };
@@ -71,7 +71,9 @@ export function RoomForm({ onSubmit }) {
 
   // ✅ 시간 확정
   const handleConfirm = async () => {
-    const formatted = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+    const formatted = `${String(hour).padStart(2, "0")}:${String(
+      minute
+    ).padStart(2, "0")}`;
 
     if (pickerMode === "start") {
       setStartTime(formatted);
@@ -97,14 +99,18 @@ export function RoomForm({ onSubmit }) {
     if (!title.trim()) return Alert.alert("⚠️ 제목을 입력해주세요.");
     if (!Object.keys(selectedDates).length)
       return Alert.alert("⚠️ 날짜를 선택해주세요.");
-    if (!startTime || !endTime)
-      return Alert.alert("⚠️ 시간대를 설정해주세요.");
+    if (!startTime || !endTime) return Alert.alert("⚠️ 시간대를 설정해주세요.");
+
+    // ✅ 생성 날짜 (오늘 날짜)
+    const today = new Date();
+    const createdAt = today.toISOString().split("T")[0]; // "YYYY-MM-DD" 형식
 
     onSubmit({
       title,
       dates: Object.keys(selectedDates),
       startTime,
       endTime,
+      date: createdAt,
     });
   };
 
@@ -139,9 +145,9 @@ export function RoomForm({ onSubmit }) {
         onDayPress={handleDayPress}
         markedDates={selectedDates}
         theme={{
-          selectedDayBackgroundColor: "#6C63FF",
+          selectedDayBackgroundColor: "dodgerblue",
           todayTextColor: "#FF6B6B",
-          arrowColor: "#6C63FF",
+          arrowColor: "dodgerblue",
         }}
       />
       <Text style={styles.selectedDates}>
@@ -154,14 +160,20 @@ export function RoomForm({ onSubmit }) {
       {/* 시간 설정 */}
       <Text style={styles.label}>시간 설정</Text>
       <View style={styles.timeCard}>
-        <TouchableOpacity style={styles.timeBox} onPress={() => showPicker("start")}>
+        <TouchableOpacity
+          style={styles.timeBox}
+          onPress={() => showPicker("start")}
+        >
           <Text style={styles.timeLabel}>시작</Text>
           <Text style={[styles.timeValue, startTime && styles.activeValue]}>
             {startTime || "00:00"}
           </Text>
         </TouchableOpacity>
         <Text style={styles.colon}>~</Text>
-        <TouchableOpacity style={styles.timeBox} onPress={() => showPicker("end")}>
+        <TouchableOpacity
+          style={styles.timeBox}
+          onPress={() => showPicker("end")}
+        >
           <Text style={styles.timeLabel}>종료</Text>
           <Text style={[styles.timeValue, endTime && styles.activeValue]}>
             {endTime || "00:00"}
@@ -194,7 +206,9 @@ export function RoomForm({ onSubmit }) {
                 }}
                 renderItem={({ item }) => (
                   <View style={styles.itemContainer}>
-                    <Text style={[styles.item, item === hour && styles.selected]}>
+                    <Text
+                      style={[styles.item, item === hour && styles.selected]}
+                    >
                       {String(item).padStart(2, "0")}
                     </Text>
                   </View>
@@ -202,7 +216,7 @@ export function RoomForm({ onSubmit }) {
                 style={styles.wheel}
               />
 
-              <Text style={[styles.colon, { marginBottom: 5 }]}>:</Text>
+              <Text style={[styles.colon, { marginBottom: 11 }]}>:</Text>
 
               <FlatList
                 ref={minuteRef}
@@ -220,7 +234,9 @@ export function RoomForm({ onSubmit }) {
                 }}
                 renderItem={({ item }) => (
                   <View style={styles.itemContainer}>
-                    <Text style={[styles.item, item === minute && styles.selected]}>
+                    <Text
+                      style={[styles.item, item === minute && styles.selected]}
+                    >
                       {String(item).padStart(2, "0")}
                     </Text>
                   </View>
@@ -238,7 +254,7 @@ export function RoomForm({ onSubmit }) {
                 <Text style={{ color: "#555" }}>취소</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: "#6C63FF" }]}
+                style={[styles.modalButton, { backgroundColor: "dodgerblue" }]}
                 onPress={handleConfirm}
               >
                 <Text style={{ color: "#fff", fontWeight: "bold" }}>확인</Text>
@@ -285,7 +301,12 @@ const styles = StyleSheet.create({
   timeLabel: { fontSize: 13, color: "#888" },
   timeValue: { fontSize: 20, fontWeight: "600", color: "#aaa", marginTop: 5 },
   activeValue: { color: "#333" },
-  colon: { fontSize: 28, fontWeight: "bold", color: "#555", marginHorizontal: 8 },
+  colon: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#555",
+    marginHorizontal: 8,
+  },
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
@@ -307,7 +328,11 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   wheel: { height: ITEM_HEIGHT * VISIBLE_ITEMS, width: 80 },
-  itemContainer: { height: ITEM_HEIGHT, justifyContent: "center", alignItems: "center" },
+  itemContainer: {
+    height: ITEM_HEIGHT,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   item: { fontSize: 22, color: "#bbb", textAlign: "center" },
   selected: { color: "#333", fontWeight: "bold", fontSize: 28 },
   modalButtons: { flexDirection: "row", marginTop: 15 },
@@ -319,7 +344,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   createButton: {
-    backgroundColor: "#6C63FF",
+    backgroundColor: "dodgerblue",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
