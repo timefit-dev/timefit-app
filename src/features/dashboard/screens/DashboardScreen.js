@@ -1,128 +1,38 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Image,
-  Share,
-  Alert,
-  LayoutAnimation,
-} from "react-native";
+import React from "react";
+import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as Clipboard from "expo-clipboard";
 import { useNavigation } from "@react-navigation/native";
-import { mockRooms } from "../../../data/mockData";
+import { RoomList } from "../components/RoomList";
+import { useDashboard } from "../hooks/useDashboard";
 
 export function DashboardScreen() {
   const navigation = useNavigation();
-
-  const rooms = mockRooms;
-
-  const [expandedRoomId, setExpandedRoomId] = useState(null);
-
-  const handleInvite = async (roomTitle) => {
-    const inviteLink = `https://timefit.app/invite?room=${encodeURIComponent(
-      roomTitle
-    )}`;
-    try {
-      await Clipboard.setStringAsync(inviteLink);
-      await Share.share({
-        message: `${roomTitle} 방에 초대합니다! 🎉\n\n초대 링크: ${inviteLink}`,
-      });
-      Alert.alert("✅ 초대 링크 복사 완료", "공유 창이 열렸습니다!");
-    } catch (error) {
-      Alert.alert("오류", "초대 링크를 복사하는 중 문제가 발생했습니다.");
-      console.error(error);
-    }
-  };
-
-  const toggleExpand = (id) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpandedRoomId(expandedRoomId === id ? null : id);
-  };
-
-  const renderRoom = ({ item }) => {
-    const isExpanded = expandedRoomId === item.roomNumber;
-    return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate("TimeSetting", { room: item })}
-        activeOpacity={0.8}
-      >
-        <View style={styles.roomItem}>
-          <View style={styles.roomHeader}>
-            <View>
-              <Text style={styles.roomTitle}>{item.title}</Text>
-              <Text style={styles.roomDate}>{item.date}</Text>
-            </View>
-            <View style={styles.actions}>
-              <TouchableOpacity
-                onPress={() => handleInvite(item.title)}
-                style={styles.iconButton}
-              >
-                <Ionicons name="link-outline" size={22} color="#007AFF" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => toggleExpand(item.roomNumber)}
-                style={styles.iconButton}
-              >
-                <Ionicons
-                  name={
-                    isExpanded ? "chevron-up-outline" : "chevron-down-outline"
-                  }
-                  size={22}
-                  color="#333"
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {isExpanded && (
-            <View style={styles.roomDetails}>
-              <Text style={styles.infoText}>방장: {item.owner}</Text>
-              <Text style={styles.infoText}>날짜: {item.dates.join(", ")}</Text>
-              <Text style={styles.infoText}>
-                시간대: {item.startTime} ~ {item.endTime}
-              </Text>
-              <Text style={styles.infoText}>
-                참가자 수: {item.participants.length}명
-              </Text>
-
-              <View style={styles.participantsContainer}>
-                {item.participants.map((p) => (
-                  <View key={p.id} style={styles.participantItem}>
-                    <Image source={p.avatar} style={styles.avatar} />
-                    <Text style={styles.participantName}>{p.name}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          )}
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  const { rooms, handleInvite, expandedRoomId, toggleExpand } = useDashboard();
 
   return (
     <View style={styles.container}>
-      {/* 상단 헤더 */}
+      {/* 상단 로고 & 프로필 */}
       <View style={styles.header}>
-        <Image source={require("@assets/logo.png")} style={styles.logo} />
+        <Image
+          source={require("@assets/logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
         <TouchableOpacity
-          style={styles.profileButton}
           onPress={() => navigation.navigate("Profile")}
+          style={styles.profileButton}
         >
-          <Ionicons name="person-circle-outline" size={28} color="#333" />
+          <Ionicons name="person-circle-outline" size={30} color="#333" />
         </TouchableOpacity>
       </View>
 
       {/* 방 목록 */}
-      <FlatList
-        data={rooms}
-        renderItem={renderRoom}
-        keyExtractor={(item) => item.roomNumber}
-        contentContainerStyle={styles.listContainer}
+      <RoomList
+        rooms={rooms}
+        expandedRoomId={expandedRoomId}
+        toggleExpand={toggleExpand}
+        handleInvite={handleInvite}
+        navigation={navigation}
       />
 
       {/* 하단 추가 버튼 */}
@@ -130,7 +40,7 @@ export function DashboardScreen() {
         style={styles.addButton}
         onPress={() => navigation.navigate("RoomCreate")}
       >
-        <Ionicons name="add" size={30} color="#fff" />
+        <Ionicons name="add" size={32} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -140,8 +50,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 60,
     paddingHorizontal: 20,
+    paddingTop: 60,
   },
   header: {
     flexDirection: "row",
@@ -149,86 +59,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logo: {
-    width: 100,
-    height: 40,
-    resizeMode: "contain",
+    width: 120,
+    height: 45,
   },
   profileButton: {
-    padding: 5,
-  },
-  listContainer: {
-    marginTop: 30,
-    paddingBottom: 100,
-  },
-  roomItem: {
-    backgroundColor: "#f6f6f6",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-  },
-  roomHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  roomTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-  },
-  roomDate: {
-    fontSize: 13,
-    color: "#777",
-    marginTop: 4,
-  },
-  actions: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  iconButton: {
-    padding: 6,
-    marginLeft: 5,
-  },
-  roomDetails: {
-    marginTop: 12,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-  },
-  infoText: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 4,
-  },
-  participantsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 8,
-  },
-  participantItem: {
-    alignItems: "center",
-    marginRight: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginBottom: 4,
-  },
-  participantName: {
-    fontSize: 12,
-    color: "#333",
+    padding: 4,
   },
   addButton: {
     position: "absolute",
-    right: 20,
-    bottom: 80,
+    right: 25,
+    bottom: 40,
     backgroundColor: "#007AFF",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 65,
+    height: 65,
+    borderRadius: 32.5,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 5,
+    elevation: 6,
   },
 });
