@@ -94,24 +94,37 @@ export function RoomForm({ onSubmit }) {
     setPickerVisible(false);
   };
 
-  // ✅ 폼 제출 (중복 검증 제거, RoomForm만 담당)
-  const handleSubmit = () => {
+  // ✅ RoomForm.js - handleSubmit 내부 수정
+  const handleSubmit = async () => {
     if (!title.trim()) return Alert.alert("⚠️ 제목을 입력해주세요.");
     if (!Object.keys(selectedDates).length)
       return Alert.alert("⚠️ 날짜를 선택해주세요.");
     if (!startTime || !endTime) return Alert.alert("⚠️ 시간대를 설정해주세요.");
 
-    // ✅ 생성 날짜 (오늘 날짜)
-    const today = new Date();
-    const createdAt = today.toISOString().split("T")[0]; // "YYYY-MM-DD" 형식
+    // ✅ 날짜 정렬 (작은 날짜 → 큰 날짜)
+    const sortedDates = Object.keys(selectedDates).sort(
+      (a, b) => new Date(a) - new Date(b)
+    );
 
-    onSubmit({
+    const today = new Date();
+    const createdAt = today.toISOString().split("T")[0];
+
+    // ✅ 만료일 = createdAt 기준 + 2일
+    const expiresDate = new Date(createdAt);
+    expiresDate.setDate(expiresDate.getDate() + 2);
+    const formattedExpiresAt = expiresDate.toISOString().split("T")[0];
+
+    const requestBody = {
       title,
-      dates: Object.keys(selectedDates),
+      dates: sortedDates, // ✅ 정렬된 날짜 사용
       startTime,
       endTime,
-      date: createdAt,
-    });
+      createdAt,
+      expiresAt: formattedExpiresAt,
+      owner: "1",
+    };
+
+    onSubmit(requestBody);
   };
 
   // ✅ 드래그 시 중앙 인덱스 감지

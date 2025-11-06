@@ -1,3 +1,4 @@
+// src/features/auth/screens/LoginScreen.js
 import React from "react";
 import {
   View,
@@ -9,14 +10,34 @@ import {
   Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { handleKakaoLogin } from "../services/KakaoLogin";
+import { handleNaverLogin } from "../services/NaverLogin";
+import { handleAppleLogin } from "../services/AppleLogin";
+import { useGoogleAuth } from "../services/GoogleLogin"; // expo-auth-session 버전
 
 export function LoginScreen() {
   const navigation = useNavigation();
   const { width, height } = useWindowDimensions();
+  const { handleGoogleLogin } = useGoogleAuth();
 
-  const handleLogin = (type) => {
-    console.log(`${type} 로그인 시도`);
-    navigation.navigate("Dashboard");
+  const handleLogin = async (type) => {
+    try {
+      let user = null;
+
+      if (type === "카카오") user = await handleKakaoLogin();
+      if (type === "네이버") user = await handleNaverLogin();
+      if (type === "애플") user = await handleAppleLogin();
+      if (type === "구글") user = await handleGoogleLogin();
+
+      if (user) {
+        console.log("✅ 로그인 성공:", user);
+        navigation.replace("Dashboard");
+      } else {
+        console.warn("⚠️ 로그인 취소 또는 실패");
+      }
+    } catch (err) {
+      console.error("로그인 중 오류:", err);
+    }
   };
 
   return (
@@ -100,12 +121,8 @@ const styles = StyleSheet.create({
     marginBottom: "25%",
     marginTop: "10%",
   },
-  logo: {
-    alignSelf: "center",
-  },
-  buttonContainer: {
-    width: "100%",
-  },
+  logo: { alignSelf: "center" },
+  buttonContainer: { width: "100%" },
   button: {
     flexDirection: "row",
     alignItems: "center",
@@ -123,14 +140,8 @@ const styles = StyleSheet.create({
     opacity: 0.9,
     transform: [{ scale: 0.98 }],
   },
-  iconRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  icon: {
-    resizeMode: "contain",
-    marginRight: 10,
-  },
+  iconRow: { flexDirection: "row", alignItems: "center" },
+  icon: { resizeMode: "contain", marginRight: 10 },
   googleButton: { backgroundColor: "#DB4437" },
   kakaoButton: { backgroundColor: "#FEE500" },
   appleButton: { backgroundColor: "#000" },
