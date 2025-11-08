@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
-export function TimeTable({ times, renderCell,}) {
+export function TimeTable({ times, renderCell, onHeaderLayout, onScroll, scrollRef }) {
   // 1. `times` 배열을 날짜(dates)와 시간(timeSlots)으로 분리하여 그리드 구조로 가공합니다.
   // `useMemo`를 사용하여 `times` prop이 변경될 때만 이 비싼 연산을 수행하도록 최적화합니다.
   const { dates, timeSlots } = React.useMemo(() => {
@@ -31,10 +32,15 @@ export function TimeTable({ times, renderCell,}) {
 
   // 2. 가공된 데이터를 기반으로 시간표 그리드를 렌더링합니다.
   return (
-    <ScrollView horizontal>
+    <ScrollView
+      horizontal
+      ref={scrollRef}
+      onScroll={onScroll}
+      scrollEventThrottle={16}
+    >
       <View>
         {/* 날짜 헤더 */}
-        <View style={styles.row}>
+        <View style={styles.row} onLayout={onHeaderLayout}>
           <View style={styles.timeLabelCell} />
           {dates.map((date) => (
             <View key={date} style={styles.headerCell}>
