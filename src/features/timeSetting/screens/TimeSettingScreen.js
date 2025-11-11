@@ -35,13 +35,13 @@ export function TimeSettingScreen({ route }) {
   const { roomId = 1 } = route.params || {};
   const {
     room,
-    times = [],
-    dates = [],
-    timeSlots = [],
-    selected = new Set(),
-    toggle = () => {},
-    setSelectionForCells = () => {},
-    submit = () => {},
+    times,
+    dates,
+    timeSlots,
+    selected,
+    toggle,
+    setSelectionForCells,
+    submit,
   } = useTimeSetting(roomId) || {};
 
   const {
