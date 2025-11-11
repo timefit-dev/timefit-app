@@ -6,11 +6,10 @@ import { ResultCard } from "../components/ResultCard";
 import { useResult } from "../hooks/useResult";
 
 // 결과를 표시하는 셀 컴포넌트
-const ResultCell = React.memo(function ResultCell({ date, time, availability }) {
+const ResultCell = React.memo(function ResultCell({ dateTime, availability }) {
   const cellStyle = React.useMemo(() => {
-    const dateTime = `${date} ${time}`;
-    if (availability?.counts.has(dateTime)) {
-      const count = availability.counts.get(dateTime);
+    const count = availability?.counts.get(dateTime);
+    if (count != null) {
       const total = availability.total || 1;
       const opacity = total > 0 ? Math.max(0.1, count / total) : 0.1;
       return {
@@ -18,7 +17,7 @@ const ResultCell = React.memo(function ResultCell({ date, time, availability }) 
       };
     }
     return {};
-  }, [availability, date, time]);
+  }, [availability, dateTime]);
 
   return <View style={[styles.cell, cellStyle]} />;
 });
@@ -60,7 +59,7 @@ export function ResultScreen({ route }) {
         renderCell={({ date, time }) => {
           const dateTime = `${date} ${time}`;
           return (
-            <ResultCell key={dateTime} date={date} time={time} availability={availabilityData} />
+            <ResultCell key={dateTime} dateTime={dateTime} availability={availabilityData} />
           );
         }}
       />
