@@ -6,7 +6,7 @@ import {
   TIME_LABEL_CELL_WIDTH,
 } from "../../../shared/components/TimeTable";
 
-const DRAG_ACTIVATION_THRESHOLD = 6;
+const DRAG_ACTIVATION_THRESHOLD = 6; // 드래그로 간주하기 위한 최소 이동 거리 (픽셀 단위)
 
 // 시간표(TimeTable)에서 드래그하여 셀을 선택하는 로직을 관리하는 커스텀 훅
 export function useDragSelection({
@@ -54,11 +54,18 @@ export function useDragSelection({
   // 터치 이벤트의 좌표(x, y)를 기반으로 해당하는 셀의 고유 키(예: "2025-01-01 10:00")를 반환
   const getCellKey = useCallback(
     (nativeEvent) => {
-      if (!dates || dates.length === 0 || !timeSlots || timeSlots.length === 0) {
+      if (
+        !dates ||
+        dates.length === 0 ||
+        !timeSlots ||
+        timeSlots.length === 0
+      ) {
         return null;
       }
 
-      const { x, y } = nativeEvent; const adjustedX = x + scrollOffsetRef.current; const adjustedY = y;
+      const { x, y } = nativeEvent;
+      const adjustedX = x + scrollOffsetRef.current;
+      const adjustedY = y;
       const headerHeight = headerHeightRef.current;
 
       if (adjustedX < TIME_LABEL_CELL_WIDTH || adjustedY < headerHeight) {
@@ -92,9 +99,9 @@ export function useDragSelection({
       if (!cellKey) return;
 
       const dragState = dragStateRef.current;
-      if (!dragState.mode) {
-        dragState.mode = selected.has(cellKey) ? "deselect" : "select";
-      }
+      // if (!dragState.mode) {
+      //   dragState.mode = selected.has(cellKey) ? "deselect" : "select";
+      // }
 
       // 한 번의 드래그 동안 동일한 셀을 중복 처리하지 않도록 방지
       if (dragState.visited.has(cellKey)) return;
@@ -115,10 +122,13 @@ export function useDragSelection({
         .onBegin((event) => {
           resetDragState();
           const cellKey = getCellKey(event);
-          if (cellKey) {
-            dragStateRef.current.startCell = cellKey;
-          }
+          if (!cellKey) return;
+
+          const isAlreadySelected = selected.has(cellKey);
+          dragStateRef.current.mode = isAlreadySelected ? "deselect" : "select";
+          dragStateRef.current.startCell = cellKey;
         })
+
         // 제스처가 진행 중일 때: 드래그가 일정 거리 이상 움직이면 활성화하고, 셀 선택 로직을 적용
         .onUpdate((event) => {
           const { translationX = 0, translationY = 0 } = event;
@@ -127,7 +137,7 @@ export function useDragSelection({
           // 사용자가 약간만 움직였을 경우(단순 터치) 드래그로 간주하지 않음
           if (!dragState.activated) {
             const traveled = Math.max(
-              //Math.abs(translationX),
+              Math.abs(translationX),
               Math.abs(translationY)
             );
             if (traveled >= DRAG_ACTIVATION_THRESHOLD) {
@@ -144,8 +154,10 @@ export function useDragSelection({
           const cellKey = getCellKey(event);
           applyDragSelection(cellKey);
         })
+
         // 제스처가 끝났을 때: 드래그 상태를 초기화
         .onEnd(resetDragState)
+
         // 모든 콜백을 JS 스레드에서 실행하도록 설정 (React 상태 업데이트를 위함)
         .runOnJS(true),
     [getCellKey, applyDragSelection, resetDragState]

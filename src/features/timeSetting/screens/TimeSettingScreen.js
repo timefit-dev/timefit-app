@@ -23,10 +23,7 @@ const SelectableCell = React.memo(function SelectableCell({
   return (
     <Pressable
       onPress={() => onPress(dateTime)}
-      style={[
-        styles.cell,
-        isSelected && styles.selectedCell,
-      ]}
+      style={[styles.cell, isSelected && styles.selectedCell]}
     />
   );
 });
@@ -44,29 +41,25 @@ export function TimeSettingScreen({ route }) {
     submit,
   } = useTimeSetting(roomId) || {};
 
-  const {
-    scrollRef,
-    dragSelectionGesture,
-    handleHeaderLayout,
-    handleScroll,
-  } = useDragSelection({
-    dates,
-    timeSlots,
-    selected,
-    setSelectionForCells,
-  });
+  const { scrollRef, dragSelectionGesture, handleHeaderLayout, handleScroll } =
+    useDragSelection({
+      dates,
+      timeSlots,
+      selected,
+      setSelectionForCells,
+    });
 
   const handleSubmit = () => {
     submit();
   };
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{ room ? room.title : "방 제목" }</Text>
+        <Text style={styles.title}>{room ? room.title : "방 제목"}</Text>
         {room && (
           <Text style={styles.participants}>
-          {room.respondedCount} / {room.totalParticipants} 명 참여
+            {room.respondedCount} / {room.totalParticipants} 명 참여
           </Text>
         )}
       </View>
