@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -26,9 +24,8 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-web-browser"
-    ],
+    "plugins": ["expo-web-browser"],
+    "scheme": "timefit",
     "extra": {
       "eas": {
         "projectId": "d9161715-aa6a-4307-8904-f1a475766c05"

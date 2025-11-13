@@ -10,22 +10,97 @@ import {
   Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { handleKakaoLogin } from "../services/KakaoLogin";
-import { handleNaverLogin } from "../services/NaverLogin";
+import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useGoogleAuth } from "../services/GoogleLogin";
 import { handleAppleLogin } from "../services/AppleLogin";
-import { useGoogleAuth } from "../services/GoogleLogin"; // expo-auth-session 버전
+
+// ✅ 세션 자동 마무리 (Expo 공식 권장)
+WebBrowser.maybeCompleteAuthSession();
 
 export function LoginScreen() {
   const navigation = useNavigation();
   const { width, height } = useWindowDimensions();
   const { handleGoogleLogin } = useGoogleAuth();
 
+  // ✅ Kakao OAuth 설정
+  const KAKAO_REST_API_KEY = "f939f9e98e824f5ce7592923a30ed35c";
+  const redirectUri = AuthSession.makeRedirectUri({
+    scheme: "timefit",
+    useProxy: true,
+  });
+
+  const discovery = {
+    authorizationEndpoint: "https://kauth.kakao.com/oauth/authorize",
+    tokenEndpoint: "https://kauth.kakao.com/oauth/token",
+  };
+
+  // ✅ Expo SDK 54 이상에서는 useAuthRequest 사용
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+    {
+      clientId: KAKAO_REST_API_KEY,
+      redirectUri,
+      responseType: AuthSession.ResponseType.Code,
+      usePKCE: false,
+    },
+    discovery
+  );
+
+  const handleKakaoLogin = async () => {
+    try {
+      // ✅ 브라우저에서 카카오 로그인 열기
+      const result = await promptAsync({ useProxy: true });
+
+      if (result.type !== "success" || !result.params?.code) {
+        console.warn("⚠️ 로그인 취소 또는 실패");
+        return null;
+      }
+
+      const code = result.params.code;
+      console.log("✅ 인가 코드:", code);
+
+      // ✅ 토큰 요청
+      const tokenResponse = await fetch(discovery.tokenEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          grant_type: "authorization_code",
+          client_id: KAKAO_REST_API_KEY,
+          redirect_uri: redirectUri,
+          code,
+        }).toString(),
+      });
+
+      const tokenData = await tokenResponse.json();
+
+      if (!tokenData.access_token) {
+        console.warn("⚠️ 토큰 요청 실패:", tokenData);
+        return null;
+      }
+
+      await AsyncStorage.setItem("kakao_access_token", tokenData.access_token);
+      console.log("🔑 토큰:", tokenData.access_token);
+
+      // ✅ 사용자 정보 요청
+      const userInfoResponse = await fetch("https://kapi.kakao.com/v2/user/me", {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` },
+      });
+      const userInfo = await userInfoResponse.json();
+      console.log("👤 사용자 정보:", userInfo);
+
+      return userInfo;
+    } catch (error) {
+      console.error("카카오 로그인 오류:", error);
+      return null;
+    }
+  };
+
+  // ✅ 로그인 버튼 클릭 핸들러
   const handleLogin = async (type) => {
     try {
       let user = null;
-
       if (type === "카카오") user = await handleKakaoLogin();
-      if (type === "네이버") user = await handleNaverLogin();
       if (type === "애플") user = await handleAppleLogin();
       if (type === "구글") user = await handleGoogleLogin();
 
@@ -40,6 +115,7 @@ export function LoginScreen() {
     }
   };
 
+  // ✅ UI (기존 그대로)
   return (
     <View style={styles.container}>
       {/* 로고 */}
@@ -53,28 +129,25 @@ export function LoginScreen() {
 
       {/* 로그인 버튼들 */}
       <View style={styles.buttonContainer}>
-        {["구글", "카카오", "애플", "네이버"].map((type) => {
+        {["구글", "카카오", "애플"].map((type) => {
           if (type === "애플" && Platform.OS !== "ios") return null;
 
           const buttonStyle = {
             구글: styles.googleButton,
             카카오: styles.kakaoButton,
             애플: styles.appleButton,
-            네이버: styles.naverButton,
           }[type];
 
           const iconSource = {
             구글: require("@assets/google_icon.png"),
             카카오: require("@assets/kakao_icon.png"),
             애플: require("@assets/apple_icon.png"),
-            네이버: require("@assets/naver_icon.png"),
           }[type];
 
           const textStyle = {
             구글: styles.googleText,
             카카오: styles.kakaoText,
             애플: styles.appleText,
-            네이버: styles.naverText,
           }[type];
 
           return (
@@ -145,9 +218,7 @@ const styles = StyleSheet.create({
   googleButton: { backgroundColor: "#DB4437" },
   kakaoButton: { backgroundColor: "#FEE500" },
   appleButton: { backgroundColor: "#000" },
-  naverButton: { backgroundColor: "#1EC800" },
   googleText: { color: "#fff", fontWeight: "600" },
   kakaoText: { color: "#000", fontWeight: "600" },
   appleText: { color: "#fff", fontWeight: "600" },
-  naverText: { color: "#fff", fontWeight: "600" },
 });
