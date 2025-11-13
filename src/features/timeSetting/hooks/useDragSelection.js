@@ -63,20 +63,25 @@ export function useDragSelection({
         return null;
       }
 
+      // 시간표 스크롤 시 보정된 좌표 계산
       const { x, y } = nativeEvent;
       const adjustedX = x + scrollOffsetRef.current;
       const adjustedY = y;
       const headerHeight = headerHeightRef.current;
 
+      // 라벨,헤더 영역은 제외
       if (adjustedX < TIME_LABEL_CELL_WIDTH || adjustedY < headerHeight) {
         return null;
       }
 
+      // 몇 번째 열 인지 계산
       const columnIndex = Math.floor(
         (adjustedX - TIME_LABEL_CELL_WIDTH) / DAY_CELL_WIDTH
       );
+      // 몇 번째 시간 인지 계산
       const rowIndex = Math.floor((adjustedY - headerHeight) / CELL_HEIGHT);
 
+      // 범위를 벗어나면 null
       if (
         columnIndex < 0 ||
         columnIndex >= dates.length ||
@@ -86,6 +91,7 @@ export function useDragSelection({
         return null;
       }
 
+      // 날짜 + 시간으로 key 생성
       const date = dates[columnIndex];
       const time = timeSlots[rowIndex];
       return `${date} ${time}`;
@@ -118,6 +124,7 @@ export function useDragSelection({
   const dragSelectionGesture = useMemo(
     () =>
       Gesture.Pan()
+        //.activeOffsetX([-0.1, 0.1])
         // 제스처가 시작될 때: 드래그 상태를 초기화하고 시작 셀을 기록
         .onBegin((event) => {
           resetDragState();

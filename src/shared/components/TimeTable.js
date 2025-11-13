@@ -43,6 +43,13 @@ export function TimeTable({
       ref={scrollRef}
       onScroll={onScroll}
       scrollEventThrottle={16}
+      bounces={false}
+      alwaysBounceHHorizontal={false}
+      overScrollMode="never"
+      scrollEnabled={true}
+      contentContainerStyle={{
+        minWidth: dates.length * DAY_CELL_WIDTH + TIME_LABEL_CELL_WIDTH,
+      }}
     >
       <View>
         {/* 날짜 헤더 */}

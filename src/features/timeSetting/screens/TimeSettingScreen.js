@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { GestureDetector } from "react-native-gesture-handler";
+import { GestureDetector, ScrollView } from "react-native-gesture-handler";
 import { useTimeSetting } from "../hooks/useTimeSetting";
 import { useDragSelection } from "../hooks/useDragSelection";
 import {
@@ -63,6 +63,7 @@ export function TimeSettingScreen({ route }) {
           </Text>
         )}
       </View>
+
       <View style={styles.selectorContainer}>
         <GestureDetector gesture={dragSelectionGesture}>
           <View style={styles.gestureWrapper}>
