@@ -1,46 +1,13 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
-
-const TimeCell = React.memo(function TimeCell({
-  date,
-  time,
-  isSelected,
-  availability,
-  readOnly,
-  onPress,
-}) {
-  const dateTime = `${date} ${time}`;
-
-  // 참여 가능 인원 수에 따라 셀의 배경색 투명도를 계산합니다.
-  // availability나 dateTime이 변경될 때만 재계산하여 성능을 최적화합니다.
-  const cellStyle = React.useMemo(() => {
-    if (availability?.counts.has(dateTime)) {
-      const count = availability.counts.get(dateTime);
-      const total = availability.total || 1;
-      // 0으로 나누는 것을 방지하고, 최소 투명도를 보장합니다.
-      const opacity = total > 0 ? Math.max(0.1, count / total) : 0.1;
-      return {
-        backgroundColor: `rgba(30, 144, 255, ${opacity})`,
-      };
-    }
-    return {};
-  }, [availability, dateTime]);
-
-  return (
-    <Pressable
-      disabled={readOnly}
-      onPress={() => onPress && onPress(dateTime)}
-      style={[styles.cell, cellStyle, isSelected && styles.selectedCell]}
-    />
-  );
-});
+import { View, Text, StyleSheet } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 export function TimeTable({
   times,
-  selected = new Set(),
-  toggle,
-  readOnly = false,
-  availability,
+  renderCell,
+  onHeaderLayout,
+  onScroll,
+  scrollRef,
 }) {
   // 1. `times` 배열을 날짜(dates)와 시간(timeSlots)으로 분리하여 그리드 구조로 가공합니다.
   // `useMemo`를 사용하여 `times` prop이 변경될 때만 이 비싼 연산을 수행하도록 최적화합니다.
@@ -71,10 +38,22 @@ export function TimeTable({
 
   // 2. 가공된 데이터를 기반으로 시간표 그리드를 렌더링합니다.
   return (
-    <ScrollView horizontal>
+    <ScrollView
+      horizontal
+      ref={scrollRef}
+      onScroll={onScroll}
+      scrollEventThrottle={16}
+      bounces={false}
+      alwaysBounceHHorizontal={false}
+      overScrollMode="never"
+      scrollEnabled={true}
+      contentContainerStyle={{
+        minWidth: dates.length * DAY_CELL_WIDTH + TIME_LABEL_CELL_WIDTH,
+      }}
+    >
       <View>
         {/* 날짜 헤더 */}
-        <View style={styles.row}>
+        <View style={styles.row} onLayout={onHeaderLayout}>
           <View style={styles.timeLabelCell} />
           {dates.map((date) => (
             <View key={date} style={styles.headerCell}>
@@ -91,18 +70,7 @@ export function TimeTable({
             </View>
             {dates.map((date) => {
               // `TimeCell` 컴포넌트를 사용하여 각 시간대별 셀을 렌더링합니다.
-              const dateTime = `${date} ${time}`;
-              return (
-                <TimeCell
-                  key={dateTime}
-                  date={date}
-                  time={time}
-                  isSelected={selected.has(dateTime)}
-                  availability={availability}
-                  readOnly={readOnly}
-                  onPress={toggle}
-                />
-              );
+              return renderCell({ date, time });
             })}
           </View>
         ))}
@@ -114,21 +82,21 @@ export function TimeTable({
 // --- 스타일 정의 ---
 
 // 그리드 레이아웃 관련 상수
-const DAY_CELL_WIDTH = 65;
-const TIME_LABEL_CELL_WIDTH = 60;
-const CELL_HEIGHT = 40;
-const DEFAULT_PADDING = 10;
+export const DAY_CELL_WIDTH = 65;
+export const TIME_LABEL_CELL_WIDTH = 60;
+export const CELL_HEIGHT = 40;
+export const DEFAULT_PADDING = 10;
 
 // 테두리 두께 관련 상수
-const HEADER_BORDER_WIDTH = 1;
-const TIME_LABEL_BORDER_WIDTH = 1;
-const CELL_BORDER_WIDTH = 0.5;
+export const HEADER_BORDER_WIDTH = 1;
+export const TIME_LABEL_BORDER_WIDTH = 1;
+export const CELL_BORDER_WIDTH = 0.5;
 
 // 색상 및 폰트 관련 상수
-const GRID_BORDER_COLOR = "#ccc";
-const CELL_BORDER_COLOR = "#eee";
-const SELECTED_CELL_BACKGROUND = "dodgerblue";
-const HEADER_FONT_WEIGHT = "bold";
+export const GRID_BORDER_COLOR = "#ccc";
+export const CELL_BORDER_COLOR = "#eee";
+export const SELECTED_CELL_BACKGROUND = "dodgerblue";
+export const HEADER_FONT_WEIGHT = "bold";
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row" },
