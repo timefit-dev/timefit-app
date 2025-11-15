@@ -10,7 +10,9 @@ export function RoomCreateScreen() {
 
   const handleCreate = async (data) => {
     const result = await createRoom(data);
-    if (result?.success) {
+
+    if (result) {
+      /* console.log("✅ 생성된 방:", result); */
       navigation.navigate("Dashboard");
     }
   };
@@ -25,5 +27,10 @@ export function RoomCreateScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", paddingTop: 40 },
-  title: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
 });

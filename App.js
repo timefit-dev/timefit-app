@@ -2,6 +2,8 @@
 import React from "react";
 import { Platform, UIManager } from "react-native";
 import { AppNavigation } from "./src/navigation/AppNavigation";
+import * as WebBrowser from "expo-web-browser";
+WebBrowser.maybeCompleteAuthSession();
 
 if (
   Platform.OS === "android" &&
