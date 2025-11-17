@@ -1,0 +1,1 @@
+export const API_BASE_URL = "https://your-backend.com/api"; // 실제 백엔드 주소로 수정

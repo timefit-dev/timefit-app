@@ -1,27 +1,28 @@
+// src/features/auth/services/KakaoLogin.js
 import * as AuthSession from "expo-auth-session";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const KAKAO_REST_API_KEY = "f939f9e98e824f5ce7592923a30ed35c";
 
-// ✅ Expo 개발환경용 redirect URI
 const redirectUri = AuthSession.makeRedirectUri({
-  scheme: "timefit", // app.json의 scheme과 동일
+  scheme: "timefit",
   useProxy: true,
 });
 
-// ✅ Kakao OAuth 설정
 const discovery = {
   authorizationEndpoint: "https://kauth.kakao.com/oauth/authorize",
   tokenEndpoint: "https://kauth.kakao.com/oauth/token",
 };
 
+/**
+ * @returns {{ login: () => Promise<SocialUser | null>, request: any }}
+ */
 export function useKakaoAuth() {
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: KAKAO_REST_API_KEY,
       redirectUri,
       responseType: AuthSession.ResponseType.Code,
-      usePKCE: false, // Kakao는 PKCE 미사용
+      usePKCE: false,
     },
     discovery
   );
@@ -29,16 +30,13 @@ export function useKakaoAuth() {
   const login = async () => {
     try {
       const result = await promptAsync({ useProxy: true });
-
       if (result.type !== "success" || !result.params?.code) {
-        console.warn("⚠️ 로그인 취소 또는 실패");
+        console.warn("⚠️ Kakao 로그인 취소 또는 실패");
         return null;
       }
 
       const code = result.params.code;
-      console.log("✅ 인가 코드:", code);
 
-      // 🔑 토큰 요청
       const tokenRes = await fetch(discovery.tokenEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -51,29 +49,31 @@ export function useKakaoAuth() {
       });
 
       const tokenData = await tokenRes.json();
-
-      if (!tokenData.access_token) {
-        console.warn("⚠️ 토큰 요청 실패:", tokenData);
+      const accessToken = tokenData.access_token;
+      if (!accessToken) {
+        console.warn("⚠️ Kakao 토큰 요청 실패:", tokenData);
         return null;
       }
 
-      await AsyncStorage.setItem("kakao_access_token", tokenData.access_token);
-      console.log("🔑 액세스 토큰:", tokenData.access_token);
-
-      // 👤 사용자 정보 요청
       const meRes = await fetch("https://kapi.kakao.com/v2/user/me", {
-        headers: { Authorization: `Bearer ${tokenData.access_token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
-
       const userInfo = await meRes.json();
-      console.log("👤 사용자 정보:", userInfo);
 
-      return userInfo;
+      return {
+        provider: "kakao",
+        socialId: userInfo.id?.toString() ?? "",
+        name: userInfo.kakao_account?.profile?.nickname ?? null,
+        email: userInfo.kakao_account?.email ?? null,
+        avatar:
+          userInfo.kakao_account?.profile?.profile_image_url ?? null,
+        token: accessToken,
+      };
     } catch (e) {
       console.error("카카오 로그인 오류:", e);
       return null;
     }
   };
 
-  return { login };
+  return { login, request };
 }
