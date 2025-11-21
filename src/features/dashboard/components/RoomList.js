@@ -48,7 +48,7 @@ export function RoomList({
                 onPress={() =>
                   Alert.alert(
                     "방 삭제",
-                    `"${item.title}" 방을 정말 삭제하시겠습니까?`,
+                    `"${item.title}" 방을 삭제하시겠습니까?`,
                     [
                       { text: "취소", style: "cancel" },
                       {
@@ -63,6 +63,7 @@ export function RoomList({
               >
                 <Ionicons name="trash-outline" size={20} color="#FF3B30" />
               </TouchableOpacity>
+
 
             <TouchableOpacity
               onPress={() => handleInvite(item.inviteCode)}

@@ -1,24 +1,29 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+} from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { RoomForm } from "../components/RoomForm";
 import { useRoom } from "../hooks/useRoom";
-import { useNavigation, useRoute } from "@react-navigation/native";
 
 export function RoomEditScreen() {
-  const { updateRoom } = useRoom();
   const navigation = useNavigation();
   const route = useRoute();
-
-  const { room } = route.params; // 수정할 방 데이터
+  const { room } = route.params; // Dashboard → RoomEditScreen 전달된 방 전체 데이터
+  const { updateRoom } = useRoom();
 
   const handleUpdate = async (data) => {
-    // data = RoomForm에서 입력받은 수정된 값들
-
+    // data = RoomForm에서 반환된 { title, dates, startTime, endTime }
     const result = await updateRoom(room.roomNumber, data);
 
     if (result) {
-      /* console.log("✅ 수정된 방:", result); */
-      navigation.navigate("Dashboard");
+      Alert.alert("✔ 방 수정 완료", "방 정보가 성공적으로 수정되었습니다.");
+      navigation.navigate("Dashboard"); // 수정 후 목록으로
+    } else {
+      Alert.alert("❌ 수정 실패", "다시 시도해주세요.");
     }
   };
 
@@ -41,7 +46,11 @@ export function RoomEditScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingTop: 40 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: 40,
+  },
   title: {
     fontSize: 22,
     fontWeight: "bold",

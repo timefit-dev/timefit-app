@@ -116,12 +116,12 @@ export function RoomForm({ onSubmit, submitLabel = "방 생성" }) {
 
     const requestBody = {
       title,
-      dates: sortedDates, // ✅ 정렬된 날짜 사용
+      dates: sortedDates,
       startTime,
       endTime,
-      createdAt,
+      /* createdAt,
       expiresAt: formattedExpiresAt,
-      owner: "1",
+      owner: "1", */
     };
 
     onSubmit(requestBody);
