@@ -33,6 +33,8 @@ export function DashboardScreen() {
         toggleExpand={toggleExpand}
         handleInvite={handleInvite}
         navigation={navigation}
+        onEdit={(room) => navigation.navigate("RoomEdit", { room })}
+        onDelete={(roomNumber) => console.log("삭제:", roomNumber)}
       />
 
       {/* 하단 추가 버튼 */}

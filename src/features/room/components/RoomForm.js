@@ -18,7 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const ITEM_HEIGHT = 40;
 const VISIBLE_ITEMS = 5;
 
-export function RoomForm({ onSubmit }) {
+export function RoomForm({ onSubmit, submitLabel = "방 생성" }) {
   const [title, setTitle] = useState("");
   const [selectedDates, setSelectedDates] = useState({});
   const [startTime, setStartTime] = useState("");
@@ -277,13 +277,13 @@ export function RoomForm({ onSubmit }) {
         </View>
       </Modal>
 
-      {/* 생성 버튼 */}
       <TouchableOpacity
         style={[styles.createButton, { marginBottom: insets.bottom + 10 }]}
         onPress={handleSubmit}
       >
-        <Text style={styles.createButtonText}>방 생성</Text>
+        <Text style={styles.createButtonText}>{submitLabel}</Text>
       </TouchableOpacity>
+
     </ScrollView>
   );
 }
