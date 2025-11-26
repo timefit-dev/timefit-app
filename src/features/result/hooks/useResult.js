@@ -64,16 +64,24 @@ export function useResult(roomId) {
 
   // 상세 보기 데이터를 가공 (불참자 계산 및 정렬)
   const detailData = useMemo(() => {
-    if (!resultData || !resultData.timeSlots) return [];
+    if (!resultData || !resultData.bestSlots) return [];
     
-    const allParticipants = resultData.bestSlots && resultData.bestSlots.length > 0
-      ? resultData.bestSlots[0].participants
-      : [];
+    // 모든 참여자 목록 집계 (모든 bestSlots에서 유니크한 참가자 수집)
+    const allParticipantsMap = new Map();
+    resultData.bestSlots.forEach(slot => {
+      slot.participants.forEach(p => {
+        if (!allParticipantsMap.has(p.id)) {
+          allParticipantsMap.set(p.id, p);
+        }
+      });
+    });
+    const allParticipants = Array.from(allParticipantsMap.values());
 
-    const processedData = resultData.timeSlots.map((slot) => {
-      const availableParticipantIds = new Set(
-        slot.participants.map((p) => p.id)
-      );
+    // 시간대별 데이터를 가공 (bestSlots 사용)
+    const processedData = resultData.bestSlots.map((slot) => {
+      // 해당 시간대에 '가능'한 사람: 목록에 있고, hasResponded가 false가 아닌 사람
+      const availableParticipants = slot.participants.filter(p => p.hasResponded !== false);
+      const availableParticipantIds = new Set(availableParticipants.map((p) => p.id));
 
       // 불참자 계산: 전체 참가자 중 availableParticipantIds에 없는 사람
       const unavailableParticipants = allParticipants.filter(
@@ -82,6 +90,7 @@ export function useResult(roomId) {
 
       return {
         ...slot,
+        availableCount: availableParticipants.length,
         unavailableParticipants,
         unavailableCount: unavailableParticipants.length,
       };
@@ -92,8 +101,12 @@ export function useResult(roomId) {
       // 가능 인원 순 (내림차순)
       return processedData.sort((a, b) => b.availableCount - a.availableCount);
     } else {
-      // 날짜 순 (오름차순)
-      return processedData.sort((a, b) => new Date(a.date) - new Date(b.date));
+      // 날짜 순 (오름차순) -> 날짜가 같으면 시간 순
+      return processedData.sort((a, b) => {
+        const dateA = new Date(`${a.date} ${a.time}`);
+        const dateB = new Date(`${b.date} ${b.time}`);
+        return dateA - dateB;
+      });
     }
   }, [resultData, sortOption]);
 

@@ -160,13 +160,9 @@ export function ResultScreen({ route }) {
                       style={[styles.chip, styles.unavailableChip]}
                     >
                       <Image
-                        source={
-                          p.profileImage
-                            ? { uri: p.profileImage }
-                            : p.avatar || { uri: "https://via.placeholder.com/150" }
-                        }
-                        style={styles.profileImage}
-                      />
+                      source={{ uri: p.profileImage }}
+                      style={styles.profileImage}
+                    />
                       <Text style={styles.unavailableChipText}>
                         {p.nickname || p.name}
                       </Text>
