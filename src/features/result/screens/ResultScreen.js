@@ -247,43 +247,61 @@ export function ResultScreen({ route }) {
       </ScrollView>
       <View style={styles.buttonContainer}>
         <Pressable
-          style={styles.editButton}
+          style={[styles.commonButton, styles.editButton]}
           onPress={() => navigation.navigate("TimeSetting", { roomId })}
         >
-          <Text style={styles.editButtonText}>수정하기</Text>
+          <Text style={styles.buttonText}>수정하기</Text>
         </Pressable>
         <Pressable
-          style={styles.toDashboardButton}
+          style={[styles.commonButton, styles.toDashboardButton]}
           onPress={() => navigation.navigate("Dashboard")}
         >
-          <Text style={styles.toDashboardButtonText}>목록으로</Text>
+          <Text style={styles.buttonText}>목록으로</Text>
         </Pressable>
       </View>
     </View>
   );
 }
 
-// 색상
+// --- Constants ---
+// Colors
 const COLOR_PRIMARY = "dodgerblue";
 const COLOR_SECONDARY = "gray";
 const COLOR_WHITE = "#fff";
-const COLOR_LIGHT_GRAY = "#f9f9f9"; // 탭 배경 등
+const COLOR_LIGHT_GRAY = "#f9f9f9";
+const COLOR_BORDER = "#eee";
+const COLOR_BORDER_DARK = "#ccc";
+const COLOR_TEXT_PRIMARY = "#151E26";
+const COLOR_TEXT_SECONDARY = "gray";
+const COLOR_CHIP_BG_AVAILABLE = "#e3f2fd";
+const COLOR_CHIP_BG_UNAVAILABLE = "#ffebee";
+const COLOR_PROFILE_BG = "#e6e6e6";
 
-// 폰트
-const FONT_SIZE_TITLE = 24;
-const FONT_SIZE_BUTTON = 16;
+// Fonts
+const FONT_SIZE_XS = 12;
+const FONT_SIZE_SM = 14;
+const FONT_SIZE_MD = 16;
+const FONT_SIZE_LG = 18;
+const FONT_SIZE_XL = 24;
 const FONT_WEIGHT_BOLD = "bold";
+const FONT_WEIGHT_SEMIBOLD = "600";
+const FONT_WEIGHT_MEDIUM = "500";
 
-// 간격
-const SPACING_CONTAINER = 20;
-const SPACING_BUTTON_VERTICAL = 15;
-const SPACING_BUTTON_BOTTOM = 10;
+// Spacing
+const SPACING_XS = 4;
+const SPACING_SM = 8;
+const SPACING_MD = 12;
+const SPACING_LG = 20;
+const SPACING_XL = 24;
 
-// 테두리
-const BORDER_RADIUS_DEFAULT = 10;
+// Dimensions
+const BORDER_RADIUS_SM = 8;
+const BORDER_RADIUS_MD = 10;
+const BORDER_RADIUS_LG = 16;
+const PROFILE_SIZE = 24;
+const BUTTON_HEIGHT = 50; // Unified button height
 
 const styles = StyleSheet.create({
-  header: { padding: 20, borderBottomWidth: 1, borderColor: "#eee" },
   container: {
     flex: 1,
     backgroundColor: COLOR_WHITE,
@@ -291,32 +309,34 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
   },
-  title: {
-    fontSize: FONT_SIZE_TITLE,
-    fontWeight: FONT_WEIGHT_BOLD,
-  },
-  roomName: { fontSize: 16, color: "gray", marginTop: 4 },
   centered: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  timetableContainer: {
-    marginTop: 20,
-    marginBottom: 20,
+  
+  // Header
+  header: {
+    padding: SPACING_LG,
+    borderBottomWidth: 1,
+    borderColor: COLOR_BORDER,
   },
-  cell: {
-    width: DAY_CELL_WIDTH,
-    height: CELL_HEIGHT,
-    borderWidth: CELL_BORDER_WIDTH,
-    borderColor: CELL_BORDER_COLOR,
+  title: {
+    fontSize: FONT_SIZE_XL,
+    fontWeight: FONT_WEIGHT_BOLD,
+    color: COLOR_TEXT_PRIMARY,
+  },
+  roomName: {
+    fontSize: FONT_SIZE_MD,
+    color: COLOR_TEXT_SECONDARY,
+    marginTop: SPACING_XS,
   },
 
-  // 탭 스타일
+  // Tab
   tabContainer: {
     flexDirection: "row",
     borderBottomWidth: 1,
-    borderColor: "#eee",
+    borderColor: COLOR_BORDER,
   },
   tabButton: {
     flex: 1,
@@ -328,138 +348,180 @@ const styles = StyleSheet.create({
     borderColor: COLOR_PRIMARY,
   },
   tabText: {
-    fontSize: 16,
-    color: "gray",
+    fontSize: FONT_SIZE_MD,
+    color: COLOR_TEXT_SECONDARY,
   },
   activeTabText: {
     color: COLOR_PRIMARY,
-    fontWeight: "bold",
+    fontWeight: FONT_WEIGHT_BOLD,
   },
+
+  // Timetable
+  timetableContainer: {
+    marginTop: SPACING_LG,
+    marginBottom: SPACING_LG,
+  },
+  cell: {
+    width: DAY_CELL_WIDTH,
+    height: CELL_HEIGHT,
+    borderWidth: CELL_BORDER_WIDTH,
+    borderColor: CELL_BORDER_COLOR,
+  },
+
+  // Detail View
   detailContainer: {
-    padding: 20,
+    padding: SPACING_LG,
   },
+  
+  // Dropdown
   dropdownButtonStyle: {
     width: 150,
     height: 40,
-    backgroundColor: "#FFF",
-    borderRadius: 8,
+    backgroundColor: COLOR_WHITE,
+    borderRadius: BORDER_RADIUS_SM,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: COLOR_BORDER_DARK,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 12,
+    paddingHorizontal: SPACING_MD,
     marginBottom: 15,
   },
   dropdownButtonTxtStyle: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#151E26",
+    fontSize: FONT_SIZE_MD,
+    fontWeight: FONT_WEIGHT_MEDIUM,
+    color: COLOR_TEXT_PRIMARY,
   },
   dropdownButtonArrowStyle: {
     fontSize: 20,
-    color: "#151E26",
+    color: COLOR_TEXT_PRIMARY,
   },
   dropdownMenuStyle: {
-    backgroundColor: "#FFF",
-    borderRadius: 8,
+    backgroundColor: COLOR_WHITE,
+    borderRadius: BORDER_RADIUS_SM,
   },
   dropdownItemStyle: {
     width: "100%",
     flexDirection: "row",
-    paddingHorizontal: 12,
+    paddingHorizontal: SPACING_MD,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 8,
+    paddingVertical: SPACING_SM,
   },
   dropdownItemTxtStyle: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#151E26",
+    fontSize: FONT_SIZE_MD,
+    fontWeight: FONT_WEIGHT_MEDIUM,
+    color: COLOR_TEXT_PRIMARY,
   },
+
+  // Detail Card
   detailCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
+    backgroundColor: COLOR_WHITE,
+    borderRadius: BORDER_RADIUS_LG,
+    padding: SPACING_LG,
+    marginBottom: SPACING_LG,
     elevation: 5,
     borderWidth: 1,
-    borderColor: "#e6e6e6ff",
+    borderColor: "#e6e6e6",
+  },
+  cardHeader: {
+    marginBottom: SPACING_MD,
   },
   detailDate: {
-    fontSize: 18,
+    fontSize: FONT_SIZE_LG,
     fontWeight: "700",
     color: "#333",
   },
   divider: {
     height: 1,
     backgroundColor: "#f0f0f0",
-    marginBottom: 15,
+    marginBottom: SPACING_MD,
   },
   participantSection: {
-    marginBottom: 15,
+    marginBottom: SPACING_MD,
   },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: SPACING_SM,
   },
   participantLabel: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: FONT_SIZE_MD,
+    fontWeight: FONT_WEIGHT_SEMIBOLD,
+    color: COLOR_TEXT_PRIMARY,
   },
-  chip: {
-    flexDirection: "row", // 가로 정렬 → 이미지 왼쪽 / 텍스트 오른쪽
-    alignItems: "center",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
+  
+  // Chips
   chipContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: SPACING_SM,
     justifyContent: "flex-start",
   },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  availableChip: {
+    backgroundColor: COLOR_CHIP_BG_AVAILABLE,
+  },
+  unavailableChip: {
+    backgroundColor: COLOR_CHIP_BG_UNAVAILABLE,
+  },
+  availableChipText: {
+    fontSize: FONT_SIZE_SM,
+    color: "#1565c0",
+    fontWeight: "500",
+  },
+  unavailableChipText: {
+    fontSize: FONT_SIZE_SM,
+    color: "#c62828",
+    fontWeight: "500",
+  },
   profileImage: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    marginRight: 6,
-    backgroundColor: "#e6e6e6",
+    width: PROFILE_SIZE,
+    height: PROFILE_SIZE,
+    borderRadius: PROFILE_SIZE / 2,
+    marginRight: SPACING_SM,
+    backgroundColor: COLOR_PROFILE_BG,
   },
   emptyText: {
-    fontSize: 14,
-    color: "gray",
+    fontSize: FONT_SIZE_SM,
+    color: COLOR_TEXT_SECONDARY,
+    fontStyle: "italic",
+  },
+
+  // Buttons
+  buttonContainer: {
+    marginTop: SPACING_LG,
+    marginBottom: SPACING_LG,
+  },
+  commonButton: {
+    paddingVertical: 15,
+    marginHorizontal: SPACING_LG,
+    borderRadius: BORDER_RADIUS_MD,
+    alignItems: "center",
+    justifyContent: "center",
+    height: BUTTON_HEIGHT,
   },
   editButton: {
     backgroundColor: COLOR_PRIMARY,
-    padding: SPACING_BUTTON_VERTICAL,
-    marginHorizontal: SPACING_CONTAINER,
-    marginBottom: SPACING_BUTTON_BOTTOM,
-    borderRadius: BORDER_RADIUS_DEFAULT,
-    alignItems: "center",
-  },
-  editButtonText: {
-    color: COLOR_WHITE,
-    fontSize: FONT_SIZE_BUTTON,
-    fontWeight: FONT_WEIGHT_BOLD,
+    marginBottom: 10,
   },
   toDashboardButton: {
     backgroundColor: COLOR_SECONDARY,
-    padding: SPACING_BUTTON_VERTICAL,
-    marginHorizontal: SPACING_CONTAINER,
-    marginBottom: SPACING_CONTAINER,
-    borderRadius: BORDER_RADIUS_DEFAULT,
-    alignItems: "center",
+    marginBottom: SPACING_LG,
   },
-  toDashboardButtonText: {
+  buttonText: {
     color: COLOR_WHITE,
-    fontSize: FONT_SIZE_BUTTON,
+    fontSize: FONT_SIZE_MD,
     fontWeight: FONT_WEIGHT_BOLD,
   },
-  buttonContainer: { marginTop: 20, marginBottom: 20 },
 });
 
 export default ResultScreen;
