@@ -8,19 +8,17 @@ import { useRoom } from "../../room/hooks/useRoom";
 
 export function DashboardScreen() {
   const navigation = useNavigation();
-  const { rooms, refreshRooms, expandedRoomId, toggleExpand, handleInvite } = useDashboard();
+  const { rooms, setRooms, refreshRooms, expandedRoomId, toggleExpand, handleInvite } = useDashboard();
   const { deleteRoom } = useRoom();
 
   const handleDelete = async (roomNumber) => {
-    /* const ok = await deleteRoom(roomNumber);
+    // TODO: 서버 연동 시 deleteRoom(roomNumber) 실행 후 아래 로직으로 교체 예정
 
-    if (ok) {
-      Alert.alert("삭제 완료", "방이 성공적으로 삭제되었습니다.");
-      // 🔥 Dashboard 새로고침 필요하면 useDashboard()에서 rooms 재요청 처리
-    } */
     // 🔥 서버 연동 전: 그냥 프론트에서 목록에서만 제거
     Alert.alert("삭제 완료", "서버 연동 전이라 프론트에서만 삭제합니다.");
-    setRooms((prev) => prev.filter((room) => room.roomNumber !== roomNumber));
+    setRooms((prev) => prev.filter((room) => room.roomNumber !== roomNumber)); // 새로고침
+
+    // TODO: 서버 연동 후 refreshRooms()로 실제 데이터 재요청
   };
   return (
     <View style={styles.container}>
