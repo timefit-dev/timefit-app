@@ -1,17 +1,47 @@
-import { Alert } from "react-native";
-import { roomApi } from "../services/roomApi";
+import { useState } from "react";
 
 export function useRoom() {
-  const createRoom = async (roomData) => {
+  const BASE_URL = "http://YOUR_SERVER_URL";
+
+  const createRoom = async (data) => { /* 이미 있음 */ };
+
+  // 🔥 PUT /rooms/{roomId}
+  const updateRoom = async (roomId, data) => {
     try {
-      const result = await roomApi.createRoom(roomData);
-      /* console.log("✅ 방 생성 성공 (테스트):", result); */
-      return result;
-    } catch (e) {
-      console.error("❌ 방 생성 중 오류:", e);
-      Alert.alert("오류", "방 생성 중 문제가 발생했습니다.");
+      const response = await fetch(`${BASE_URL}/rooms/${roomId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) throw new Error("Update failed");
+
+      return await response.json();
+    } catch (err) {
+      console.error("❌ 방 수정 실패:", err);
       return null;
     }
   };
-  return { createRoom };
+
+  // 🔥 DELETE /rooms/{roomId}
+  const deleteRoom = async (roomId) => {
+    try {
+      const response = await fetch(`${BASE_URL}/rooms/${roomId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Delete failed");
+
+      return true;
+    } catch (err) {
+      console.error("❌ 방 삭제 실패:", err);
+      return false;
+    }
+  };
+
+  return {
+    createRoom,
+    updateRoom,
+    deleteRoom,
+  };
 }

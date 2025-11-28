@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   LayoutAnimation,
+  Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -16,18 +17,54 @@ export function RoomList({
   toggleExpand,
   handleInvite,
   navigation,
+  onEdit,
+  onDelete,
 }) {
   const renderRoom = ({ item }) => {
     const isExpanded = expandedRoomId === item.roomNumber;
 
     return (
-      <View style={styles.roomItem}>
+      <TouchableOpacity 
+        style={styles.roomItem}
+        onPress={() =>
+          navigation.navigate("TimeSetting", {
+            roomId: item.roomNumber,
+          })
+        }>
         <View style={styles.roomHeader}>
           <View>
             <Text style={styles.roomTitle}>{item.title}</Text>
             <Text style={styles.roomDate}>{item.date}</Text>
           </View>
           <View style={styles.actions}>
+             <TouchableOpacity
+                onPress={() => onEdit(item)}
+                style={styles.iconButton}
+              >
+                <Ionicons name="create-outline" size={20} color="#007AFF" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() =>
+                  Alert.alert(
+                    "방 삭제",
+                    `"${item.title}" 방을 삭제하시겠습니까?`,
+                    [
+                      { text: "취소", style: "cancel" },
+                      {
+                        text: "삭제",
+                        style: "destructive",
+                        onPress: () => onDelete(item.roomNumber),
+                      },
+                    ]
+                  )
+                }
+                style={styles.iconButton}
+              >
+                <Ionicons name="trash-outline" size={20} color="#FF3B30" />
+              </TouchableOpacity>
+
+
             <TouchableOpacity
               onPress={() => handleInvite(item.inviteCode)}
               style={styles.iconButton}
@@ -70,7 +107,7 @@ export function RoomList({
             </View>
           </View>
         )}
-      </View>
+      </TouchableOpacity>
     );
   };
 
