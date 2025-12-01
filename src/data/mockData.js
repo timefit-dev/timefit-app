@@ -65,98 +65,289 @@ export const mockRooms = [
 ];
 
 export const mockRoomConfig = {
-  roomId: 1,
+  roomId: 101,
   title: "스터디 모임",
-  dates: ["2025-10-15", "2025-10-17", "2025-10-20", "2025-10-22", "2025-10-30"],
-  timeSlots: ["09:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"],
+  dates: ["2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24"],
+  timeSlots: [
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+  ],
   isOwner: false,
   hasResponded: false,
-  totalParticipants: 5,
-  respondedCount: 3,
+  totalParticipants: 6,
+  respondedCount: 5,
 };
 
 export const mockResultData = {
-  message: "응답이 저장되었습니다",
-  roomInfo: {
-    ...mockRoomConfig, // title, totalParticipants, respondedCount 등 포함
-  },
-  allParticipants: [
-    { id: 1, nickname: "김철수" },
-    { id: 2, nickname: "이영희" },
-    { id: 3, nickname: "최지우" },
-    { id: 4, nickname: "정수진" },
-    { id: 5, nickname: "박민수" },
-  ],
-  // 방에 설정된 모든 날짜와 시간대를 포함해야 합니다.
-  dates: mockRoomConfig.dates,
-  timeSlots: mockRoomConfig.timeSlots,
-  participantsInfo: [
-    {
-      date: "2025-10-17",
-      time: "13:00",
-      availableCount: 3,
-      participants: [
-        { id: 1, nickname: "김철수" },
-        { id: 2, nickname: "이영희" },
-        { id: 5, nickname: "박민수" },
-      ],
-    },
-    {
-      date: "2025-10-17",
-      time: "14:00",
-      availableCount: 2,
-      participants: [
-        { id: 3, nickname: "최지우" },
-        { id: 4, nickname: "정수진" },
-      ],
-    },
-    {
-      date: "2025-10-17",
-      time: "15:00",
-      availableCount: 5,
-      participants: [
-        { id: 1, nickname: "김철수" },
-        { id: 2, nickname: "이영희" },
-        { id: 3, nickname: "최지우" },
-        { id: 4, nickname: "정수진" },
-        { id: 5, nickname: "박민수" },
-      ],
-    },
-    {
-      date: "2025-10-17",
-      time: "16:00",
-      availableCount: 4,
-      participants: [
-        { id: 1, nickname: "김철수" },
-        { id: 2, nickname: "이영희" },
-        { id: 4, nickname: "정수진" },
-        { id: 5, nickname: "박민수" },
-      ],
-    },
-    {
-      date: "2025-10-17",
-      time: "17:00",
-      availableCount: 2,
-      participants: [
-        { id: 1, nickname: "김철수" },
-        { id: 2, nickname: "이영희" },
-      ],
-    },
+  roomId: 101,
+  title: "스터디 모임 상세 일정 조율",
+  totalParticipants: 6,
+
+  // [날짜별 요약]: 해당 날짜의 '최대 가능 인원' 기준
+  timeSlots: [
     {
       date: "2025-10-20",
-      time: "14:00",
-      availableCount: 3,
+      availableCount: 6, // 월요일: 14시~15시에 전원 참여 가능
       participants: [
-        { id: 1, nickname: "김철수" },
-        { id: 3, nickname: "최지우" },
-        { id: 4, nickname: "정수진" },
+        { id: 1, nickname: "김민수", profileImage: "https://..." },
+        { id: 2, nickname: "이서준", profileImage: "https://..." },
+        { id: 3, nickname: "박지은", profileImage: "https://..." },
+        { id: 4, nickname: "최현우", profileImage: "https://..." },
+        { id: 5, nickname: "정수민", profileImage: "https://..." },
+        { id: 6, nickname: "강민호", profileImage: "https://..." },
+      ],
+    },
+    {
+      date: "2025-10-21",
+      availableCount: 4, // 화요일: 최대 4명 겹침
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://..." },
+        { id: 3, nickname: "박지은", profileImage: "https://..." },
+        { id: 4, nickname: "최현우", profileImage: "https://..." },
+        { id: 6, nickname: "강민호", profileImage: "https://..." },
       ],
     },
     {
       date: "2025-10-22",
+      availableCount: 5, // 수요일: 저녁 시간에 5명 가능
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://..." },
+        { id: 2, nickname: "이서준", profileImage: "https://..." },
+        { id: 4, nickname: "최현우", profileImage: "https://..." },
+        { id: 5, nickname: "정수민", profileImage: "https://..." },
+        { id: 6, nickname: "강민호", profileImage: "https://..." },
+      ],
+    },
+    {
+      date: "2025-10-23",
+      availableCount: 3, // 목요일: 시간이 많이 갈려서 최대 3명
+      participants: [
+        { id: 2, nickname: "이서준", profileImage: "https://..." },
+        { id: 3, nickname: "박지은", profileImage: "https://..." },
+        { id: 5, nickname: "정수민", profileImage: "https://..." },
+      ],
+    },
+    {
+      date: "2025-10-24",
+      availableCount: 2, // 금요일: 참여 저조 (최대 2명)
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://..." },
+        { id: 6, nickname: "강민호", profileImage: "https://..." },
+      ],
+    },
+  ],
+
+  // [시간대별 상세]: 13:00 ~ 20:00 (다양한 인원 분포)
+  bestSlots: [
+    // --- 10월 20일 (월) : 참여율 높음 ---
+    {
+      date: "2025-10-20",
+      time: "13:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+        { id: 3, nickname: "박지은", profileImage: "https://...", hasResponded: true },
+        { id: 4, nickname: "최현우", profileImage: "https://...", hasResponded: true },
+      ], // 4명
+    },
+    {
+      date: "2025-10-20",
+      time: "14:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+        { id: 3, nickname: "박지은", profileImage: "https://...", hasResponded: true },
+        { id: 4, nickname: "최현우", profileImage: "https://...", hasResponded: true },
+        { id: 5, nickname: "정수민", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 6명 (Best)
+    },
+    {
+      date: "2025-10-20",
+      time: "15:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+        { id: 3, nickname: "박지은", profileImage: "https://...", hasResponded: true },
+        { id: 4, nickname: "최현우", profileImage: "https://...", hasResponded: true },
+        { id: 5, nickname: "정수민", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 6명 (Best)
+    },
+    {
+      date: "2025-10-20",
       time: "16:00",
-      availableCount: 1,
-      participants: [{ id: 1, nickname: "김철수" }],
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 5, nickname: "정수민", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 3명
+    },
+    {
+      date: "2025-10-20",
+      time: "17:00",
+      participants: [
+        { id: 5, nickname: "정수민", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 2명
+    },
+    // (18:00~20:00 생략 또는 0~1명 가정하여 데이터 용량 조절, 필요시 추가 가능)
+
+    // --- 10월 21일 (화) : 중간 정도 참여 ---
+    {
+      date: "2025-10-21",
+      time: "13:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 3, nickname: "박지은", profileImage: "https://...", hasResponded: true },
+      ], // 2명
+    },
+    {
+      date: "2025-10-21",
+      time: "14:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 3, nickname: "박지은", profileImage: "https://...", hasResponded: true },
+        { id: 4, nickname: "최현우", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 4명 (Max for Tue)
+    },
+    {
+      date: "2025-10-21",
+      time: "15:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 3, nickname: "박지은", profileImage: "https://...", hasResponded: true },
+        { id: 4, nickname: "최현우", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 4명
+    },
+    {
+      date: "2025-10-21",
+      time: "16:00",
+      participants: [
+        { id: 4, nickname: "최현우", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 2명
+    },
+    {
+      date: "2025-10-21",
+      time: "19:00",
+      participants: [
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+      ], // 1명
+    },
+
+    // --- 10월 22일 (수) : 저녁 모임 선호 ---
+    {
+      date: "2025-10-22",
+      time: "13:00",
+      participants: [
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+      ], // 1명
+    },
+    {
+      date: "2025-10-22",
+      time: "18:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+        { id: 5, nickname: "정수민", profileImage: "https://...", hasResponded: true },
+      ], // 3명
+    },
+    {
+      date: "2025-10-22",
+      time: "19:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+        { id: 4, nickname: "최현우", profileImage: "https://...", hasResponded: true },
+        { id: 5, nickname: "정수민", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 5명 (Max for Wed)
+    },
+    {
+      date: "2025-10-22",
+      time: "20:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+        { id: 4, nickname: "최현우", profileImage: "https://...", hasResponded: true },
+        { id: 5, nickname: "정수민", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 5명
+    },
+
+    // --- 10월 23일 (목) : 의견 분열 (최대 3명) ---
+    {
+      date: "2025-10-23",
+      time: "13:00",
+      participants: [
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+        { id: 3, nickname: "박지은", profileImage: "https://...", hasResponded: true },
+      ], // 2명
+    },
+    {
+      date: "2025-10-23",
+      time: "14:00",
+      participants: [
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+        { id: 3, nickname: "박지은", profileImage: "https://...", hasResponded: true },
+        { id: 5, nickname: "정수민", profileImage: "https://...", hasResponded: true },
+      ], // 3명 (Max for Thu)
+    },
+    {
+      date: "2025-10-23",
+      time: "15:00",
+      participants: [
+        { id: 2, nickname: "이서준", profileImage: "https://...", hasResponded: true },
+        { id: 5, nickname: "정수민", profileImage: "https://...", hasResponded: true },
+      ], // 2명
+    },
+    {
+      date: "2025-10-23",
+      time: "16:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 2명 (다른 그룹)
+    },
+
+    // --- 10월 24일 (금) : 참여 저조 ---
+    {
+      date: "2025-10-24",
+      time: "13:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+      ], // 1명
+    },
+    {
+      date: "2025-10-24",
+      time: "14:00",
+      participants: [
+        { id: 1, nickname: "김민수", profileImage: "https://...", hasResponded: true },
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 2명 (Max for Fri)
+    },
+    {
+      date: "2025-10-24",
+      time: "15:00",
+      participants: [
+        { id: 6, nickname: "강민호", profileImage: "https://...", hasResponded: true },
+      ], // 1명
+    },
+    {
+      date: "2025-10-24",
+      time: "18:00",
+      participants: [
+        { id: 3, nickname: "박지은", profileImage: "https://...", hasResponded: true },
+      ], // 1명
     },
   ],
 };
