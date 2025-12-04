@@ -41,13 +41,19 @@ export function TimeSettingScreen({ route }) {
     submit,
   } = useTimeSetting(roomId) || {};
 
-  const { scrollRef, dragSelectionGesture, handleHeaderLayout, handleScroll } =
-    useDragSelection({
-      dates,
-      timeSlots,
-      selected,
-      setSelectionForCells,
-    });
+  const {
+    horizontalScrollRef,
+    verticalScrollRef,
+    dragSelectionGesture,
+    handleHeaderLayout,
+    handleHorizontalScroll,
+    handleVerticalScroll,
+  } = useDragSelection({
+    dates,
+    timeSlots,
+    selected,
+    setSelectionForCells,
+  });
 
   const handleSubmit = () => {
     submit();
@@ -62,13 +68,17 @@ export function TimeSettingScreen({ route }) {
             {room.respondedCount} / {room.totalParticipants} 명 참여
           </Text>
         )}
-        <Text style={styles.headerSubText}>안녕</Text>
+        <Text style={styles.headerSubText}>짧게 눌러서 하나씩 선택, 길게 눌러서 드레그 선택</Text>
       </View>
 
       <View style={styles.selectorContainer}>
         <GestureDetector gesture={dragSelectionGesture}>
           <View style={styles.gestureWrapper}>
-            <ScrollView ref={scrollRef} onScroll={handleScroll}>
+            <ScrollView
+              ref={verticalScrollRef}
+              onScroll={handleVerticalScroll}
+              scrollEventThrottle={16}
+            >
               <TimeTable
                 times={times}
                 renderCell={({ date, time }) => {
@@ -84,8 +94,8 @@ export function TimeSettingScreen({ route }) {
                   );
                 }}
                 onHeaderLayout={handleHeaderLayout}
-                onScroll={handleScroll}
-                scrollRef={scrollRef}
+                onScroll={handleHorizontalScroll}
+                scrollRef={horizontalScrollRef}
               />
             </ScrollView>
           </View>

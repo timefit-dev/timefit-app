@@ -17,7 +17,9 @@ export function useDragSelection({
   setSelectionForCells,
 }) {
   // ScrollView 컴포넌트를 참조하여 스크롤 위치 등을 제어
-  const scrollRef = useRef(null);
+  const horizontalScrollRef = useRef(null);
+  const verticalScrollRef = useRef(null);
+
   // 드래그 상태(모드, 시작 셀, 방문한 셀 등)를 관리. 리렌더링을 유발하지 않기 위해 ref 사용
   const dragStateRef = useRef({
     mode: null,
@@ -27,8 +29,9 @@ export function useDragSelection({
   });
   // 시간표 헤더의 높이를 저장하여 셀 좌표 계산에 사용
   const headerHeightRef = useRef(CELL_HEIGHT);
-  // 수평 스크롤의 현재 위치를 저장
-  const scrollOffsetRef = useRef(0);
+  // 스크롤의 현재 위치를 저장
+  const scrollXRef = useRef(0);
+  const scrollYRef = useRef(0);
 
   // --- 드래그 상태 관리 ---
   // 드래그 상태를 초기화하는 함수
@@ -47,8 +50,12 @@ export function useDragSelection({
     headerHeightRef.current = event.nativeEvent.layout.height;
   }, []);
 
-  const handleScroll = useCallback((event) => {
-    scrollOffsetRef.current = event.nativeEvent.contentOffset.x;
+  const handleHorizontalScroll = useCallback((event) => {
+    scrollXRef.current = event.nativeEvent.contentOffset.x;
+  }, []);
+
+  const handleVerticalScroll = useCallback((event) => {
+    scrollYRef.current = event.nativeEvent.contentOffset.y;
   }, []);
 
   // --- 핵심 로직 ---
@@ -66,8 +73,10 @@ export function useDragSelection({
 
       // 시간표 스크롤 시 보정된 좌표 계산
       const { x, y } = nativeEvent;
-      const adjustedX = x + scrollOffsetRef.current;
-      const adjustedY = y;
+      // x축은 TimeTable 내부의 가로 스크롤
+      const adjustedX = x + scrollXRef.current;
+      // y축은 TimeSettingScreen 전체의 세로 스크롤
+      const adjustedY = y + scrollYRef.current;
       const headerHeight = headerHeightRef.current;
 
       // 라벨,헤더 영역은 제외
@@ -159,9 +168,11 @@ export function useDragSelection({
   );
 
   return {
-    scrollRef,
+    horizontalScrollRef,
+    verticalScrollRef,
     dragSelectionGesture,
     handleHeaderLayout,
-    handleScroll,
+    handleHorizontalScroll,
+    handleVerticalScroll,
   };
 }
