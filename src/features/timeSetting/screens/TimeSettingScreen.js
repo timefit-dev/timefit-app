@@ -62,29 +62,32 @@ export function TimeSettingScreen({ route }) {
             {room.respondedCount} / {room.totalParticipants} 명 참여
           </Text>
         )}
+        <Text style={styles.headerSubText}>안녕</Text>
       </View>
 
       <View style={styles.selectorContainer}>
         <GestureDetector gesture={dragSelectionGesture}>
           <View style={styles.gestureWrapper}>
-            <TimeTable
-              times={times}
-              renderCell={({ date, time }) => {
-                const dateTime = `${date} ${time}`;
-                return (
-                  <SelectableCell
-                    key={dateTime}
-                    date={date}
-                    time={time}
-                    isSelected={selected.has(dateTime)}
-                    onPress={toggle}
-                  />
-                );
-              }}
-              onHeaderLayout={handleHeaderLayout}
-              onScroll={handleScroll}
-              scrollRef={scrollRef}
-            />
+            <ScrollView ref={scrollRef} onScroll={handleScroll}>
+              <TimeTable
+                times={times}
+                renderCell={({ date, time }) => {
+                  const dateTime = `${date} ${time}`;
+                  return (
+                    <SelectableCell
+                      key={dateTime}
+                      date={date}
+                      time={time}
+                      isSelected={selected.has(dateTime)}
+                      onPress={toggle}
+                    />
+                  );
+                }}
+                onHeaderLayout={handleHeaderLayout}
+                onScroll={handleScroll}
+                scrollRef={scrollRef}
+              />
+            </ScrollView>
           </View>
         </GestureDetector>
       </View>
@@ -120,4 +123,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   submitButtonText: { color: "white", fontSize: 16, fontWeight: "bold" },
+  headerSubText: {
+    fontSize: 12,
+    color: "gray",
+    textAlign: "right",
+    marginTop: 4,
+  },
 });

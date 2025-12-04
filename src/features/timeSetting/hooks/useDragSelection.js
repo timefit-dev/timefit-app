@@ -1,4 +1,5 @@
 import { useRef, useCallback, useMemo } from "react";
+import { View, Text, StyleSheet, Vibration, Platform } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
 import {
   DAY_CELL_WIDTH,
@@ -124,46 +125,33 @@ export function useDragSelection({
   const dragSelectionGesture = useMemo(
     () =>
       Gesture.Pan()
-        //.activeOffsetX([-0.1, 0.1])
+        .activateAfterLongPress(300)
         // 제스처가 시작될 때: 드래그 상태를 초기화하고 시작 셀을 기록
-        .onBegin((event) => {
+        .onStart((event) => {
           resetDragState();
           const cellKey = getCellKey(event);
           if (!cellKey) return;
 
+          // 롱프레스 인식 시 진동 피드백
+          Vibration.vibrate(Platform.OS === "ios" ? 10 : 100);
+
           const isAlreadySelected = selected.has(cellKey);
           dragStateRef.current.mode = isAlreadySelected ? "deselect" : "select";
           dragStateRef.current.startCell = cellKey;
+          dragStateRef.current.activated = true; // 롱프레스로 시작되므로 바로 활성화
+          
+          // 시작 셀 즉시 적용
+          applyDragSelection(cellKey);
         })
 
-        // 제스처가 진행 중일 때: 드래그가 일정 거리 이상 움직이면 활성화하고, 셀 선택 로직을 적용
+        // 제스처가 진행 중일 때: 셀 선택 로직을 적용
         .onUpdate((event) => {
-          const { translationX = 0, translationY = 0 } = event;
-          const dragState = dragStateRef.current;
-
-          // 사용자가 약간만 움직였을 경우(단순 터치) 드래그로 간주하지 않음
-          if (!dragState.activated) {
-            const traveled = Math.max(
-              Math.abs(translationX),
-              Math.abs(translationY)
-            );
-            if (traveled >= DRAG_ACTIVATION_THRESHOLD) {
-              dragState.activated = true;
-              // 드래그가 활성화되면 시작점이었던 셀부터 선택/해제 적용
-              if (dragState.startCell) {
-                applyDragSelection(dragState.startCell);
-              }
-            } else {
-              return;
-            }
-          }
-
           const cellKey = getCellKey(event);
           applyDragSelection(cellKey);
         })
 
         // 제스처가 끝났을 때: 드래그 상태를 초기화
-        .onEnd(resetDragState)
+        .onFinalize(resetDragState)
 
         // 모든 콜백을 JS 스레드에서 실행하도록 설정 (React 상태 업데이트를 위함)
         .runOnJS(true),
