@@ -63,12 +63,16 @@ export function TimeSettingScreen({ route }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{room ? room.title : "방 제목"}</Text>
-        {room && (
-          <Text style={styles.participants}>
-            {room.respondedCount} / {room.totalParticipants} 명 참여
+        <View style={styles.titleRow}>
+          {room && (
+            <Text style={styles.participants}>
+              {room.respondedCount} / {room.totalParticipants} 명 참여
+            </Text>
+          )}
+          <Text style={styles.headerSubText}>
+            짧게 눌러서 하나씩 선택, 길게 눌러서 드레그 선택
           </Text>
-        )}
-        <Text style={styles.headerSubText}>짧게 눌러서 하나씩 선택, 길게 눌러서 드레그 선택</Text>
+        </View>
       </View>
 
       <View style={styles.selectorContainer}>
@@ -101,18 +105,31 @@ export function TimeSettingScreen({ route }) {
           </View>
         </GestureDetector>
       </View>
-      <Pressable style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>등록하기</Text>
-      </Pressable>
+      <View style={styles.submitButtonContainer}>
+        <Pressable style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>등록하기</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: "#ffffff" },
   header: { padding: 20, borderBottomWidth: 1, borderColor: "#eee" },
   title: { fontSize: 24, fontWeight: "bold" },
   participants: { fontSize: 16, color: "gray", marginTop: 4 },
+  headerSubText: {
+    fontSize: 10,
+    color: "gray",
+    textAlign: "right",
+    alignItems: "flex-end",
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   selectorContainer: { flex: 1, padding: 0 },
   gestureWrapper: { flex: 1 },
   cell: {
@@ -124,19 +141,18 @@ const styles = StyleSheet.create({
   selectedCell: {
     backgroundColor: SELECTED_CELL_BACKGROUND,
   },
+  submitButtonContainer: {
+    marginTop: 30,
+    marginBottom: 3,
+  },
   submitButton: {
     backgroundColor: "dodgerblue",
-    padding: 15,
-    margin: 20,
+    paddingVertical: 15,
+    marginHorizontal: 20,
     bottom: 20,
+    height: 50,
     borderRadius: 10,
     alignItems: "center",
   },
   submitButtonText: { color: "white", fontSize: 16, fontWeight: "bold" },
-  headerSubText: {
-    fontSize: 12,
-    color: "gray",
-    textAlign: "right",
-    marginTop: 4,
-  },
 });
