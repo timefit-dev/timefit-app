@@ -1,4 +1,5 @@
 import { useRef, useCallback, useMemo } from "react";
+import { View, Text, StyleSheet, Vibration, Platform } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
 import {
   DAY_CELL_WIDTH,
@@ -16,7 +17,9 @@ export function useDragSelection({
   setSelectionForCells,
 }) {
   // ScrollView 컴포넌트를 참조하여 스크롤 위치 등을 제어
-  const scrollRef = useRef(null);
+  const horizontalScrollRef = useRef(null);
+  const verticalScrollRef = useRef(null);
+
   // 드래그 상태(모드, 시작 셀, 방문한 셀 등)를 관리. 리렌더링을 유발하지 않기 위해 ref 사용
   const dragStateRef = useRef({
     mode: null,
@@ -26,8 +29,9 @@ export function useDragSelection({
   });
   // 시간표 헤더의 높이를 저장하여 셀 좌표 계산에 사용
   const headerHeightRef = useRef(CELL_HEIGHT);
-  // 수평 스크롤의 현재 위치를 저장
-  const scrollOffsetRef = useRef(0);
+  // 스크롤의 현재 위치를 저장
+  const scrollXRef = useRef(0);
+  const scrollYRef = useRef(0);
 
   // --- 드래그 상태 관리 ---
   // 드래그 상태를 초기화하는 함수
@@ -46,8 +50,12 @@ export function useDragSelection({
     headerHeightRef.current = event.nativeEvent.layout.height;
   }, []);
 
-  const handleScroll = useCallback((event) => {
-    scrollOffsetRef.current = event.nativeEvent.contentOffset.x;
+  const handleHorizontalScroll = useCallback((event) => {
+    scrollXRef.current = event.nativeEvent.contentOffset.x;
+  }, []);
+
+  const handleVerticalScroll = useCallback((event) => {
+    scrollYRef.current = event.nativeEvent.contentOffset.y;
   }, []);
 
   // --- 핵심 로직 ---
@@ -65,8 +73,10 @@ export function useDragSelection({
 
       // 시간표 스크롤 시 보정된 좌표 계산
       const { x, y } = nativeEvent;
-      const adjustedX = x + scrollOffsetRef.current;
-      const adjustedY = y;
+      // x축은 TimeTable 내부의 가로 스크롤
+      const adjustedX = x + scrollXRef.current;
+      // y축은 TimeSettingScreen 전체의 세로 스크롤
+      const adjustedY = y + scrollYRef.current;
       const headerHeight = headerHeightRef.current;
 
       // 라벨,헤더 영역은 제외
@@ -124,46 +134,33 @@ export function useDragSelection({
   const dragSelectionGesture = useMemo(
     () =>
       Gesture.Pan()
-        //.activeOffsetX([-0.1, 0.1])
+        .activateAfterLongPress(300)
         // 제스처가 시작될 때: 드래그 상태를 초기화하고 시작 셀을 기록
-        .onBegin((event) => {
+        .onStart((event) => {
           resetDragState();
           const cellKey = getCellKey(event);
           if (!cellKey) return;
 
+          // 롱프레스 인식 시 진동 피드백
+          Vibration.vibrate(Platform.OS === "ios" ? 10 : 100);
+
           const isAlreadySelected = selected.has(cellKey);
           dragStateRef.current.mode = isAlreadySelected ? "deselect" : "select";
           dragStateRef.current.startCell = cellKey;
+          dragStateRef.current.activated = true; // 롱프레스로 시작되므로 바로 활성화
+          
+          // 시작 셀 즉시 적용
+          applyDragSelection(cellKey);
         })
 
-        // 제스처가 진행 중일 때: 드래그가 일정 거리 이상 움직이면 활성화하고, 셀 선택 로직을 적용
+        // 제스처가 진행 중일 때: 셀 선택 로직을 적용
         .onUpdate((event) => {
-          const { translationX = 0, translationY = 0 } = event;
-          const dragState = dragStateRef.current;
-
-          // 사용자가 약간만 움직였을 경우(단순 터치) 드래그로 간주하지 않음
-          if (!dragState.activated) {
-            const traveled = Math.max(
-              Math.abs(translationX),
-              Math.abs(translationY)
-            );
-            if (traveled >= DRAG_ACTIVATION_THRESHOLD) {
-              dragState.activated = true;
-              // 드래그가 활성화되면 시작점이었던 셀부터 선택/해제 적용
-              if (dragState.startCell) {
-                applyDragSelection(dragState.startCell);
-              }
-            } else {
-              return;
-            }
-          }
-
           const cellKey = getCellKey(event);
           applyDragSelection(cellKey);
         })
 
         // 제스처가 끝났을 때: 드래그 상태를 초기화
-        .onEnd(resetDragState)
+        .onFinalize(resetDragState)
 
         // 모든 콜백을 JS 스레드에서 실행하도록 설정 (React 상태 업데이트를 위함)
         .runOnJS(true),
@@ -171,9 +168,11 @@ export function useDragSelection({
   );
 
   return {
-    scrollRef,
+    horizontalScrollRef,
+    verticalScrollRef,
     dragSelectionGesture,
     handleHeaderLayout,
-    handleScroll,
+    handleHorizontalScroll,
+    handleVerticalScroll,
   };
 }
