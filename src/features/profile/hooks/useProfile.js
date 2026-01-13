@@ -1,31 +1,72 @@
+// src/features/profile/hooks/useProfile.js
 import { useState } from "react";
 import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { getProfileData } from "../services/profileApi";
 
+/* ===============================
+   🔥 테스트 끝나면 반드시 삭제
+=============================== */
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { kakaoUnlink } from "../../auth/services/KakaoLogin";
+/* =============================== */
+
 export function useProfile() {
+  /* ===============================
+     ✅ 임시 프로필 데이터 (백엔드 미완)
+  =============================== */
+  const [name, setName] = useState("유지현");
+  const [email, setEmail] = useState("jihyun@timefit.app");
+  const [meetingCount, setMeetingCount] = useState(5);
+
   const [photo, setPhoto] = useState(require("@assets/profile.jpg"));
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [prevName, setPrevName] = useState("");
 
-  // ✅ 프로필 데이터 불러오기
+  /* ===============================
+     ⚠️ 테스트용 로그아웃 (카카오 unlink)
+     - 배포 전 반드시 제거
+  =============================== */
+  const handleLogoutForTest = async () => {
+    try {
+      // 1️⃣ 카카오 계정 - 앱 연결 완전 해제
+      /* await kakaoUnlink(); */
+      await AsyncStorage.clear();
+      console.log("✅ kakao unlink 완료 (테스트)");
+
+      // 2️⃣ 앱 JWT 제거
+      await AsyncStorage.removeItem("jwt");
+      await AsyncStorage.removeItem("refreshToken");
+
+      Alert.alert(
+        "테스트 로그아웃",
+        "카카오 연결 해제 완료\n앱을 완전히 종료 후 다시 실행하세요"
+      );
+    } catch (e) {
+      console.error(e);
+      Alert.alert("오류", "테스트 로그아웃 실패");
+    }
+  };
+
+  /* ===============================
+     ✅ 프로필 데이터 불러오기
+     - 지금은 mock + API 혼합
+     - 백엔드 완성되면 API만 사용
+  =============================== */
   const fetchProfile = async () => {
     try {
       const data = await getProfileData();
-      setName(data.nickname);
-      setEmail(data.email);
 
-      // ✅ 진짜 URL인 경우에만 변경
+      setName(data.nickname ?? "유지현");
+      setEmail(data.email ?? "jihyun@timefit.app");
+      setMeetingCount(data.meetingCount ?? 5);
+
       if (
         data.profile_image &&
         typeof data.profile_image === "string" &&
         data.profile_image.startsWith("http")
       ) {
         setPhoto({ uri: data.profile_image });
-      } else {
-        // 아무것도 안 함 → 기존 기본 이미지 유지
       }
     } catch (error) {
       console.error(error);
@@ -33,7 +74,9 @@ export function useProfile() {
     }
   };
 
-  // ✅ 사진 변경
+  /* ===============================
+     ✅ 사진 변경
+  =============================== */
   const handleEditPhoto = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
@@ -55,6 +98,9 @@ export function useProfile() {
     setPhoto({ uri: result.assets[0].uri });
   };
 
+  /* ===============================
+     ✅ 이름 수정
+  =============================== */
   const handleStartEditing = () => {
     setPrevName(name);
     setIsEditing(true);
@@ -71,12 +117,17 @@ export function useProfile() {
 
   return {
     name,
+    setName,
     email,
+    meetingCount,
     photo,
     isEditing,
+
     fetchProfile,
     handleEditPhoto,
     handleStartEditing,
     handleFinishEditing,
+
+    handleLogoutForTest, // ⚠️ 테스트용
   };
 }

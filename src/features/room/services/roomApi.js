@@ -1,80 +1,55 @@
-// src/features/room/services/roomApi.js
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// ✅ 랜덤 초대코드 생성 함수
-function generateInviteCode() {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  const part1 = Array.from(
-    { length: 4 },
-    () => chars[Math.floor(Math.random() * chars.length)]
-  ).join("");
-  const part2 = Array.from(
-    { length: 4 },
-    () => chars[Math.floor(Math.random() * chars.length)]
-  ).join("");
-  return `${part1}-${part2}`;
-}
+const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+console.log("🌐 BASE_URL:", BASE_URL);
 
 export const roomApi = {
   createRoom: async (roomData) => {
-    console.log("🧩 [TEST MODE] roomApi.createRoom 호출됨");
-    console.log("전달된 데이터:", roomData);
+    console.log("📡 roomApi.createRoom 시작");
+    console.log("📦 요청 데이터:", roomData);
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // ✅ createdAt 기준 +2일 계산
-        const createdDate = new Date(roomData.createdAt);
-        const expiresDate = new Date(createdDate);
-        expiresDate.setDate(createdDate.getDate() + 2);
-        const formattedExpiresAt = expiresDate.toISOString().split("T")[0];
+    try {
+      const token = await AsyncStorage.getItem("jwt");
+      console.log("🪪 jwt token:", token);
 
-        // ✅ startTime ~ endTime 사이 timelist 자동 생성
-        const startHour = parseInt(roomData.startTime.split(":")[0], 10);
-        const endHour = parseInt(roomData.endTime.split(":")[0], 10);
+      const payload = {
+          title: roomData.title, // ✅ roomData로 변경
+          dates: roomData.dates,
+          startTime: roomData.startTime,
+          endTime: roomData.endTime,
+      };
 
-        const timelist = [];
-        for (let i = startHour; i <= endHour; i++) {
-          timelist.push(`${String(i).padStart(2, "0")}:00`);
-        }
+      console.log("📦 실제 전송 payload:", payload);
 
-        // ✅ 순서 고정된 결과 객체
-        const orderedRoom = {
-          id: "1",
-          title: roomData.title,
-          invitecode: generateInviteCode(), // ✅ 랜덤 생성
-          owner: roomData.owner,
-          dates: roomData.dates.sort((a, b) => new Date(a) - new Date(b)), // ✅ 날짜 정렬
-          starttime: roomData.startTime,
-          endtime: roomData.endTime,
-          timelist: timelist, // ✅ 자동 생성된 timelist
-          createdAt: roomData.createdAt,
-          updatedAt: null,
-          expiresAt: formattedExpiresAt,
-        };
+      const res = await fetch(`${BASE_URL}/api/rooms`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
-        // ✅ 보기 좋게 정렬된 JSON 출력
-        console.log(
-          "✅ 방 생성 성공 (테스트):",
-          JSON.stringify(
-            orderedRoom,
-            [
-              "id",
-              "title",
-              "invitecode",
-              "owner",
-              "dates",
-              "starttime",
-              "endtime",
-              "timelist",
-              "createdAt",
-              "updatedAt",
-              "expiresAt",
-            ],
-            2
-          )
-        );
+      console.log("❌ CREATE ROOM status:", res.status);
+      const rawText = await res.text();
+      console.log("❌ CREATE ROOM body:", rawText);
 
-        resolve(orderedRoom);
-      }, 700);
-    });
+      if (res.status === 401) {
+        await AsyncStorage.clear();
+        throw new Error("UNAUTHORIZED");
+      }
+
+      if (!res.ok) {
+        throw new Error("CREATE_FAILED");
+      }
+
+      const data = JSON.parse(rawText);
+      console.log("✅ 방 생성 성공:", data);
+      return data;
+
+    } catch (error) {
+      console.error("🔥 FETCH 자체 실패:", error);
+      throw error;
+    }
   },
 };

@@ -1,21 +1,20 @@
+// src/features/profile/components/ProfileCard.js
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-export function ProfileCard() {
+export function ProfileCard({ meetingCount, email }) {
   return (
     <View style={styles.infoCard}>
       <Text style={styles.infoTitle}>내 정보</Text>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>가입일</Text>
-        <Text style={styles.infoValue}>2025-03-10</Text>
-      </View>
+
       <View style={styles.infoRow}>
         <Text style={styles.infoLabel}>참여한 모임</Text>
-        <Text style={styles.infoValue}>5개</Text>
+        <Text style={styles.infoValue}>{meetingCount}개</Text>
       </View>
+
       <View style={styles.infoRow}>
         <Text style={styles.infoLabel}>이메일</Text>
-        <Text style={styles.infoValue}>a123@naver.com</Text>
+        <Text style={styles.infoValue}>{email}</Text>
       </View>
     </View>
   );
