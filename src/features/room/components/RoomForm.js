@@ -78,8 +78,7 @@ export function RoomForm({ onSubmit, submitLabel = "방 생성" }) {
     if (pickerMode === "start") {
       setStartTime(formatted);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      // 다음으로 종료 시간 선택으로 자동 이동
-      setPickerMode("end");
+      setPickerVisible(false);
       return;
     }
 
