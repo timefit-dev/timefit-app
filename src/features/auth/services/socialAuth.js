@@ -1,5 +1,5 @@
 // src/features/auth/services/socialAuth.js
-import { kakaoLogin } from "./KakaoLogin"; // ⬅️ 경로/대소문자 정확히!
+import { kakaoLogin } from "./KakaoLogin"; 
 import { socialLogin } from "./authApi";
 
 export async function loginWithSocial(provider) {
