@@ -1,13 +1,19 @@
-/* TODO: 실제 API 연동 시 axios로 대체 */
+// src/features/profile/services/profileApi.js
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const BASE_URL = "http://13.124.232.236:8080";
+
 export async function getProfileData() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        id: 1,
-        email: "a123@naver.com",
-        nickname: "유지현",
-        profile_image: "null",
-      });
-    }, 300);
+  const jwt = await AsyncStorage.getItem("jwt");
+  if (!jwt) throw new Error("No JWT");
+
+  const res = await fetch(`${BASE_URL}/api/users/me`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
   });
+
+  if (!res.ok) throw new Error("프로필 조회 실패");
+
+  return res.json();
 }

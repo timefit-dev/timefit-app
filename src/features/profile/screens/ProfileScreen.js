@@ -1,3 +1,4 @@
+// src/features/profile/screens/ProfileScreen.js
 import React, { useEffect } from "react";
 import {
   View,
@@ -17,13 +18,17 @@ export function ProfileScreen() {
   const {
     name,
     setName,
-    isEditing,
+    email,
+    meetingCount,
     photo,
+    isEditing,
+
+    fetchProfile,
     handleEditPhoto,
-    handleLogout,
     handleStartEditing,
     handleFinishEditing,
-    fetchProfile,
+
+    handleLogoutForTest, // ⭐ 테스트용
   } = useProfile();
 
   useEffect(() => {
@@ -40,14 +45,19 @@ export function ProfileScreen() {
   return (
     <TouchableWithoutFeedback onPress={handleOutsidePress}>
       <View style={styles.container}>
+        {/* ===== 프로필 영역 ===== */}
         <View style={styles.profileContainer}>
           <View style={styles.photoWrapper}>
             <Image source={photo} style={styles.photo} />
-            <TouchableOpacity style={styles.editIcon} onPress={handleEditPhoto}>
+            <TouchableOpacity
+              style={styles.editIcon}
+              onPress={handleEditPhoto}
+            >
               <Ionicons name="pencil" size={20} color="#333" />
             </TouchableOpacity>
           </View>
 
+          {/* 이름 */}
           {isEditing ? (
             <TextInput
               style={styles.input}
@@ -62,16 +72,24 @@ export function ProfileScreen() {
             </TouchableOpacity>
           )}
 
-          <ProfileCard />
+          {/* 카드 */}
+          <ProfileCard 
+            email={email}
+            meetingCount={meetingCount}
+            />
         </View>
 
+        {/* ===== 하단 ===== */}
         <View style={styles.footer}>
           <TouchableOpacity>
             <Text style={styles.footerText}>이용약관</Text>
           </TouchableOpacity>
           <View style={styles.divider} />
-          <TouchableOpacity onPress={handleLogout}>
-            <Text style={styles.footerText}>로그아웃</Text>
+          {/* ❌ 실서비스 로그아웃 아직 없음 */}
+          <TouchableOpacity onPress={handleLogoutForTest}>
+            <Text style={styles.footerText}>
+              [테스트] 카카오 unlink
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
